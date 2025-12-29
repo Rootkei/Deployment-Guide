@@ -1,0 +1,72 @@
+<!-- THÊM VÀO SAU PHẦN PREREQUISITES, TRƯỚC "Step by Step Guide" -->
+
+<!-- Step 0 - Preparation -->
+<div class="content-block">
+    <h3 class="block-title">
+        <span class="title-number">00</span>
+        ⚠️ Chuẩn bị trước khi bắt đầu (QUAN TRỌNG!)
+    </h3>
+
+    <div class="info-box warning" style="margin-bottom: 2rem;">
+        <div class="info-icon">🚨</div>
+        <div class="info-content">
+            <strong>DỪNG LẠI!</strong> Trước khi bắt đầu deploy, đảm bảo code của bạn đã sẵn sàng. Nếu code chưa đúng,
+            deploy sẽ thất bại!
+        </div>
+    </div>
+
+    <div class="tips-grid">
+        <div class="tip-card">
+            <div class="tip-icon">🔧</div>
+            <h4>Backend Requirements</h4>
+            <ul>
+                <li>✅ Code đã push lên GitHub (public hoặc private)</li>
+                <li>✅ File <code>package.json</code> có script <code>"start"</code></li>
+                <li>✅ File <code>.gitignore</code> loại trừ <code>node_modules/</code> và <code>.env</code></li>
+                <li>✅ Đã test chạy được trên local</li>
+            </ul>
+        </div>
+
+        <div class="tip-card">
+            <div class="tip-icon">🎨</div>
+            <h4>Frontend Requirements</h4>
+            <ul>
+                <li>✅ Code đã push lên GitHub</li>
+                <li>✅ Có thể build production: <code>npm run build</code></li>
+                <li>✅ Có file <code>.env.example</code> (không commit .env thật)</li>
+                <li>✅ Build folder tên là <code>build/</code> hoặc <code>dist/</code></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="code-block" style="margin-top: 1.5rem;">
+        <div class="code-header">
+            <span class="code-language">package.json - Backend Example</span>
+            <button class="copy-btn" onclick="copyCode(this)">
+                <span class="copy-icon">📋</span>
+                Copy
+            </button>
+        </div>
+        <pre><code>{
+  "name": "my-backend",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node server.js"  // ← PHẢI CÓ script này
+  },
+  "dependencies": {
+    "express": "^4.18.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0"
+  }
+}</code></pre>
+    </div>
+
+    <div class="info-box tip" style="margin-top: 1.5rem;">
+        <div class="info-icon">💡</div>
+        <div class="info-content">
+            <strong>Pro tip:</strong> Test local trước khi deploy!<br>
+            Backend: <code>npm start</code> → Phải chạy được<br>
+            Frontend: <code>npm run build</code> → Phải build thành công
+        </div>
+    </div>
+</div>

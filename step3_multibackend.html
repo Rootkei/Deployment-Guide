@@ -1,0 +1,261 @@
+<!-- Step 3 -->
+<div class="step-card">
+    <div class="step-header">
+        <div class="step-number">Bước 3</div>
+        <h4 class="step-title">Deploy Backend (Multi-Framework)</h4>
+    </div>
+    <div class="step-content">
+        <p class="step-description">
+            Clone code backend và cấu hình để chạy. Chọn framework phù hợp với dự án của bạn.
+        </p>
+
+        <div class="code-tabs">
+            <div class="code-tab-buttons">
+                <button class="code-tab-btn active" data-tab="nodejs-be">Node.js</button>
+                <button class="code-tab-btn" data-tab="dotnet-be">C# / .NET</button>
+                <button class="code-tab-btn" data-tab="java-be">Java / Spring</button>
+                <button class="code-tab-btn" data-tab="python-be">Python / Django</button>
+                <button class="code-tab-btn" data-tab="golang-be">Go</button>
+            </div>
+
+            <!-- Node.js Tab -->
+            <div class="code-tab-content active" data-tab="nodejs-be">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Bash - Node.js Backend</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># Tạo thư mục cho app
+mkdir -p /home/ubuntu/apps
+cd /home/ubuntu/apps
+
+# Clone backend code
+git clone https://github.com/your-username/backend-nodejs.git
+cd backend-nodejs
+
+# Cài đặt dependencies
+npm install
+
+# Tạo file .env
+cat > .env << EOF
+PORT=3000
+NODE_ENV=production
+DATABASE_URL=postgresql://user:pass@localhost:5432/dbname
+JWT_SECRET=your-secret-key
+EOF
+
+# Start với PM2
+pm2 start npm --name "backend-api" -- start
+pm2 save
+pm2 startup
+
+# Kiểm tra status
+pm2 status
+pm2 logs backend-api</code></pre>
+                </div>
+            </div>
+
+            <!-- .NET Tab -->
+            <div class="code-tab-content" data-tab="dotnet-be">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Bash - C# / .NET Backend</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># Cài đặt .NET SDK
+wget https://dot.net/v1/dotnet-install.sh
+chmod +x dotnet-install.sh
+./dotnet-install.sh --channel 8.0
+
+# Add to PATH
+echo 'export PATH=$PATH:$HOME/.dotnet' >> ~/.bashrc
+source ~/.bashrc
+
+# Clone và build
+cd /home/ubuntu/apps
+git clone https://github.com/your-username/backend-dotnet.git
+cd backend-dotnet
+
+# Build
+dotnet publish -c Release -o ./publish
+
+# Tạo systemd service
+sudo tee /etc/systemd/system/backend-api.service > /dev/null <<EOF
+[Unit]
+Description=ASP.NET Core Backend API
+
+[Service]
+WorkingDirectory=/home/ubuntu/apps/backend-dotnet/publish
+ExecStart=/home/ubuntu/.dotnet/dotnet YourApp.dll
+Restart=always
+User=ubuntu
+Environment=ASPNETCORE_ENVIRONMENT=Production
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Start service
+sudo systemctl enable backend-api
+sudo systemctl start backend-api
+sudo systemctl status backend-api</code></pre>
+                </div>
+            </div>
+
+            <!-- Java Tab -->
+            <div class="code-tab-content" data-tab="java-be">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Bash - Java / Spring Boot Backend</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># Cài đặt Java 17 và Maven
+sudo apt install -y openjdk-17-jdk maven
+
+# Clone và build
+cd /home/ubuntu/apps
+git clone https://github.com/your-username/backend-java.git
+cd backend-java
+
+# Build với Maven
+mvn clean package -DskipTests
+
+# Tạo systemd service
+sudo tee /etc/systemd/system/backend-api.service > /dev/null <<EOF
+[Unit]
+Description=Spring Boot Backend API
+
+[Service]
+WorkingDirectory=/home/ubuntu/apps/backend-java
+ExecStart=/usr/bin/java -jar target/app.jar --spring.profiles.active=prod
+Restart=always
+User=ubuntu
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Start service
+sudo systemctl enable backend-api
+sudo systemctl start backend-api
+sudo journalctl -u backend-api -f</code></pre>
+                </div>
+            </div>
+
+            <!-- Python Tab -->
+            <div class="code-tab-content" data-tab="python-be">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Bash - Python / Django Backend</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># Cài đặt Python
+sudo apt install -y python3 python3-pip python3-venv
+
+# Clone và setup
+cd /home/ubuntu/apps
+git clone https://github.com/your-username/backend-python.git
+cd backend-python
+
+# Virtual environment
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt gunicorn
+
+# Run migrations
+python manage.py migrate
+python manage.py collectstatic --noinput
+
+# Tạo systemd service
+sudo tee /etc/systemd/system/backend-api.service > /dev/null <<EOF
+[Unit]
+Description=Django Backend API
+
+[Service]
+WorkingDirectory=/home/ubuntu/apps/backend-python
+Environment="PATH=/home/ubuntu/apps/backend-python/venv/bin"
+ExecStart=/home/ubuntu/apps/backend-python/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:8000 myproject.wsgi:application
+Restart=always
+User=ubuntu
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Start service
+sudo systemctl enable backend-api
+sudo systemctl start backend-api</code></pre>
+                </div>
+            </div>
+
+            <!-- Go Tab -->
+            <div class="code-tab-content" data-tab="golang-be">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Bash - Go Backend</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># Cài đặt Go
+wget https://go.dev/dl/go1.21.5.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go
+sudo tar -C /usr/local -xzf go1.21.5.linux-amd64.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+source ~/.bashrc
+
+# Clone và build
+cd /home/ubuntu/apps
+git clone https://github.com/your-username/backend-go.git
+cd backend-go
+
+# Build
+go mod download
+go build -o backend-api .
+
+# Tạo systemd service
+sudo tee /etc/systemd/system/backend-api.service > /dev/null <<EOF
+[Unit]
+Description=Go Backend API
+
+[Service]
+WorkingDirectory=/home/ubuntu/apps/backend-go
+ExecStart=/home/ubuntu/apps/backend-go/backend-api
+Restart=always
+User=ubuntu
+Environment="GIN_MODE=release"
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Start service
+sudo systemctl enable backend-api
+sudo systemctl start backend-api
+sudo journalctl -u backend-api -f</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box tip">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <strong>Lưu ý:</strong> Đảm bảo cập nhật Security Group để mở port tương ứng: 3000 (Node.js), 5000
+                (.NET), 8080 (Java/Go), 8000 (Python).
+            </div>
+        </div>
+    </div>
+</div>

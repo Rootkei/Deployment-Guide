@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Deployment Guide - Hướng dẫn triển khai Full Stack</title>
+    <meta name="description"
+        content="Hướng dẫn chi tiết cách triển khai ứng dụng Full Stack lên AWS với nhiều phương pháp khác nhau từ EC2, ECS/EKS, Lambda đến Terraform">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-background"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="gradient-text">AWS Deployment</span>
+                    <span class="hero-subtitle">Hướng dẫn triển khai Full Stack</span>
+                </h1>
+                <p class="hero-description">
+                    Khám phá 8 phương pháp triển khai ứng dụng Full Stack lên AWS, từ cơ bản đến nâng cao.
+                    Mỗi phương pháp đều có hướng dẫn chi tiết, code mẫu và best practices.
+                </p>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">Phương pháp</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">100+</div>
+                        <div class="stat-label">Code Examples</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">∞</div>
+                        <div class="stat-label">Possibilities</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Pills -->
+    <nav class="nav-pills">
+        <div class="container">
+            <div class="pills-wrapper">
+                <button class="pill active" data-method="ec2">
+                    <span class="pill-icon">🖥️</span>
+                    <span class="pill-text">EC2 Truyền thống</span>
+                    <span class="pill-stars">⭐⭐⭐⭐⭐</span>
+                </button>
+                <button class="pill" data-method="ecs">
+                    <span class="pill-icon">🐳</span>
+                    <span class="pill-text">ECS / EKS</span>
+                    <span class="pill-stars">⭐⭐⭐⭐</span>
+                </button>
+                <button class="pill" data-method="beanstalk">
+                    <span class="pill-icon">🌱</span>
+                    <span class="pill-text">Elastic Beanstalk</span>
+                    <span class="pill-stars">⭐⭐⭐</span>
+                </button>
+                <button class="pill" data-method="lambda">
+                    <span class="pill-icon">⚡</span>
+                    <span class="pill-text">Lambda</span>
+                    <span class="pill-stars">⭐⭐⭐</span>
+                </button>
+                <button class="pill" data-method="codedeploy">
+                    <span class="pill-icon">🚀</span>
+                    <span class="pill-text">CodeDeploy</span>
+                    <span class="pill-stars">⭐⭐</span>
+                </button>
+                <button class="pill" data-method="iac">
+                    <span class="pill-icon">📜</span>
+                    <span class="pill-text">IaC</span>
+                    <span class="pill-stars">⭐⭐</span>
+                </button>
+                <button class="pill" data-method="apprunner">
+                    <span class="pill-icon">🏃</span>
+                    <span class="pill-text">App Runner</span>
+                    <span class="pill-stars">⭐</span>
+                </button>
+                <button class="pill" data-method="opsworks">
+                    <span class="pill-icon">⚙️</span>
+                    <span class="pill-text">OpsWorks</span>
+                    <span class="pill-stars">⭐</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- EC2 Traditional Method -->
+            <section id="ec2" class="deployment-section active">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <h2 class="section-title">
+                            <span class="title-icon">🖥️</span>
+                            EC2 Truyền thống
+                        </h2>
+                        <div class="difficulty-badge easy">Dễ bắt đầu</div>
+                    </div>
+                    <p class="section-description">
+                        Phương pháp triển khai cơ bản nhất, phù hợp cho người mới bắt đầu.
+                        Bạn sẽ có toàn quyền kiểm soát server và cấu hình.
+                    </p>
+                </div>
+
+                <!-- Overview Cards -->
+                <div class="overview-grid">
+                    <div class="overview-card">
+                        <div class="card-icon">💰</div>
+                        <h3>Chi phí</h3>
+                        <p>$10-50/tháng</p>
+                        <span class="card-detail">Tùy instance type</span>
+                    </div>
+                    <div class="overview-card">
+                        <div class="card-icon">⏱️</div>
+                        <h3>Thời gian setup</h3>
+                        <p>30-60 phút</p>
+                        <span class="card-detail">Cho lần đầu tiên</span>
+                    </div>
+                    <div class="overview-card">
+                        <div class="card-icon">📊</div>
+                        <h3>Độ phức tạp</h3>
+                        <p>Trung bình</p>
+                        <span class="card-detail">Cần hiểu Linux cơ bản</span>
+                    </div>
+                    <div class="overview-card">
+                        <div class="card-icon">🎯</div>
+                        <h3>Phù hợp với</h3>
+                        <p>MVP, Startup</p>
+                        <span class="card-detail">Ứng dụng nhỏ-vừa</span>
+                    </div>
+                </div>
+
+                <!-- Architecture Diagram -->
+                <div class="content-block">
+                    <h3 class="block-title">
+                        <span class="title-number">01</span>
+                        Kiến trúc tổng quan
+                    </h3>
+                    <div class="architecture-diagram">
+                        <div class="arch-layer">
+                            <div class="arch-component user">
+                                <div class="component-icon">👥</div>
+                                <div class="component-label">Users</div>
+                            </div>
+                        </div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">
+                            <div class="arch-component route53">
+                                <div class="component-icon">🌐</div>
+                                <div class="component-label">Route 53</div>
+                                <div class="component-sublabel">DNS</div>
+                            </div>
+                        </div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">
+                            <div class="arch-component ec2">
+                                <div class="component-icon">🖥️</div>
+                                <div class="component-label">EC2 Instance</div>
+                                <div class="component-sublabel">Ubuntu 22.04</div>
+                            </div>
+                        </div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer split">
+                            <div class="arch-component nginx">
+                                <div class="component-icon">⚡</div>
+                                <div class="component-label">Nginx</div>
+                                <div class="component-sublabel">Frontend (Port 80)</div>
+                            </div>
+                            <div class="arch-component nodejs">
+                                <div class="component-icon">�</div>
+                                <div class="component-label">Backend API</div>
+                                <div class="component-sublabel">Node.js / C# / Java / Python / Go</div>
+                            </div>
+                        </div>
+                        <div class="arch-arrow">↓</div>
+                        <div class="arch-layer">
+                            <div class="arch-component rds">
+                                <div class="component-icon">🗄️</div>
+                                <div class="component-label">Database</div>
+                                <div class="component-sublabel">PostgreSQL / MySQL / MongoDB</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prerequisites -->
+                <div class="content-block">
+                    <h3 class="block-title">
+                        <span class="title-number">02</span>
+                        Yêu cầu trước khi bắt đầu
+                    </h3>
+                    <div class="checklist">
+                        <label class="checklist-item">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <span class="checklist-text">Tài khoản AWS đã được kích hoạt</span>
+                        </label>
+                        <label class="checklist-item">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <span class="checklist-text">AWS CLI đã được cài đặt và cấu hình</span>
+                        </label>
+                        <label class="checklist-item">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <span class="checklist-text">SSH key pair đã được tạo trong AWS Console</span>
+                        </label>
+                        <label class="checklist-item">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <span class="checklist-text">Hiểu biết cơ bản về Linux/Ubuntu</span>
+                        </label>
+                        <label class="checklist-item">
+                            <input type="checkbox" class="checklist-checkbox">
+                            <span class="checklist-text">Code ứng dụng đã sẵn sàng (Frontend + Backend)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Step by Step Guide -->
+                <div class="content-block">
+                    <h3 class="block-title">
+                        <span class="title-number">03</span>
+                        Hướng dẫn triển khai từng bước
+                    </h3>
+
+                    <!-- Step 1 -->
+                    <div class="step-card">
+                        <div class="step-header">
+                            <div class="step-number">Bước 1</div>
+                            <h4 class="step-title">Tạo EC2 Instance</h4>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-description">
+                                Đăng nhập vào AWS Console và tạo một EC2 instance mới với cấu hình phù hợp.
+                            </p>
+
+                            <div class="code-tabs">
+                                <div class="code-tab-buttons">
+                                    <button class="code-tab-btn active" data-tab="console">AWS Console</button>
+                                    <button class="code-tab-btn" data-tab="cli">AWS CLI</button>
+                                </div>
+                                <div class="code-tab-content active" data-tab="console">
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-language">Hướng dẫn trên Console</span>
+                                            <button class="copy-btn" onclick="copyCode(this)">
+                                                <span class="copy-icon">📋</span>
+                                                Copy
+                                            </button>
+                                        </div>
+                                        <pre><code>1. Vào EC2 Dashboard → Launch Instance
+2. Chọn AMI: Ubuntu Server 22.04 LTS
+3. Instance type: t2.micro (Free tier) hoặc t2.small
+4. Key pair: Chọn hoặc tạo mới
+5. Network settings:
+   - VPC: Default
+   - Auto-assign public IP: Enable
+   - Security group: Tạo mới với rules:
+     * SSH (22) - My IP
+     * HTTP (80) - Anywhere
+     * HTTPS (443) - Anywhere
+     * Custom TCP (3000) - Anywhere
+6. Storage: 20 GB gp3
+7. Launch instance</code></pre>
+                                    </div>
+                                </div>
+                                <div class="code-tab-content" data-tab="cli">
+                                    <div class="code-block">
+                                        <div class="code-header">
+                                            <span class="code-language">Bash</span>
+                                            <button class="copy-btn" onclick="copyCode(this)">
+                                                <span class="copy-icon">📋</span>
+                                                Copy
+                                            </button>
+                                        </div>
+                                        <pre><code># Tạo security group
+aws ec2 create-security-group \
+  --group-name fullstack-sg \
+  --description "Security group for full stack app"
+
+# Thêm inbound rules
+aws ec2 authorize-security-group-ingress \
+  --group-name fullstack-sg \
+  --protocol tcp --port 22 --cidr 0.0.0.0/0
+
+aws ec2 authorize-security-group-ingress \
+  --group-name fullstack-sg \
+  --protocol tcp --port 80 --cidr 0.0.0.0/0
+
+aws ec2 authorize-security-group-ingress \
+  --group-name fullstack-sg \
+  --protocol tcp --port 443 --cidr 0.0.0.0/0
+
+aws ec2 authorize-security-group-ingress \
+  --group-name fullstack-sg \
+  --protocol tcp --port 3000 --cidr 0.0.0.0/0
+
+# Launch instance
+aws ec2 run-instances \
+  --image-id ami-0c55b159cbfafe1f0 \
+  --instance-type t2.micro \
+  --key-name your-key-pair \
+  --security-groups fullstack-sg \
+  --block-device-mappings DeviceName=/dev/sda1,Ebs={VolumeSize=20}</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info-box tip">
+                                <div class="info-icon">💡</div>
+                                <div class="info-content">
+                                    <strong>Pro tip:</strong> Nên chọn t2.small thay vì t2.micro nếu ứng dụng của bạn
+                                    cần nhiều RAM hơn.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="step-card">
+                        <div class="step-header">
+                            <div class="step-number">Bước 2</div>
+                            <h4 class="step-title">Kết nối SSH và cài đặt môi trường</h4>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-description">
+                                Kết nối vào EC2 instance và cài đặt các công cụ cần thiết.
+                            </p>
+
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-language">Bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <span class="copy-icon">📋</span>
+                                        Copy
+                                    </button>
+                                </div>
+                                <pre><code># Kết nối SSH
+ssh -i "your-key.pem" ubuntu@your-ec2-public-ip
+
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Cài đặt Node.js và npm
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Cài đặt Nginx
+sudo apt install -y nginx
+
+# Cài đặt PM2 (Process Manager)
+sudo npm install -g pm2
+
+# Cài đặt Git
+sudo apt install -y git
+
+# Verify installations
+node --version
+npm --version
+nginx -v
+pm2 --version</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-card">
+                        <div class="step-header">
+                            <div class="step-number">Bước 3</div>
+                            <h4 class="step-title">Deploy Backend (Node.js)</h4>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-description">
+                                Clone code backend và cấu hình để chạy với PM2.
+                            </p>
+
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-language">Bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <span class="copy-icon">📋</span>
+                                        Copy
+                                    </button>
+                                </div>
+                                <pre><code># Tạo thư mục cho app
+mkdir -p /home/ubuntu/apps
+cd /home/ubuntu/apps
+
+# Clone backend code
+git clone https://github.com/your-username/backend.git
+cd backend
+
+# Cài đặt dependencies
+npm install
+
+# Tạo file .env
+cat > .env << EOF
+PORT=3000
+NODE_ENV=production
+DATABASE_URL=your-database-url
+JWT_SECRET=your-secret-key
+EOF
+
+# Start với PM2
+pm2 start npm --name "backend" -- start
+pm2 save
+pm2 startup
+
+# Kiểm tra status
+pm2 status
+pm2 logs backend</code></pre>
+                            </div>
+
+                            <div class="info-box warning">
+                                <div class="info-icon">⚠️</div>
+                                <div class="info-content">
+                                    <strong>Lưu ý:</strong> Đừng commit file .env vào Git. Luôn tạo file này trực tiếp
+                                    trên server.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="step-card">
+                        <div class="step-header">
+                            <div class="step-number">Bước 4</div>
+                            <h4 class="step-title">Deploy Frontend (React/Vue/Angular)</h4>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-description">
+                                Build frontend và cấu hình Nginx để serve static files.
+                            </p>
+
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-language">Bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <span class="copy-icon">📋</span>
+                                        Copy
+                                    </button>
+                                </div>
+                                <pre><code># Clone frontend code
+cd /home/ubuntu/apps
+git clone https://github.com/your-username/frontend.git
+cd frontend
+
+# Tạo file .env cho frontend
+cat > .env << EOF
+REACT_APP_API_URL=http://your-ec2-public-ip:3000
+EOF
+
+# Build production
+npm install
+npm run build
+
+# Copy build files to Nginx directory
+sudo rm -rf /var/www/html/*
+sudo cp -r build/* /var/www/html/
+
+# Set permissions
+sudo chown -R www-data:www-data /var/www/html
+sudo chmod -R 755 /var/www/html</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="step-card">
+                        <div class="step-header">
+                            <div class="step-number">Bước 5</div>
+                            <h4 class="step-title">Cấu hình Nginx</h4>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-description">
+                                Cấu hình Nginx làm reverse proxy cho backend và serve frontend.
+                            </p>
+
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-language">Nginx Config</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <span class="copy-icon">📋</span>
+                                        Copy
+                                    </button>
+                                </div>
+                                <pre><code># Tạo file cấu hình Nginx
+sudo nano /etc/nginx/sites-available/fullstack
+
+# Paste nội dung sau:
+server {
+    listen 80;
+    server_name your-domain.com;  # hoặc IP public
+
+    # Frontend
+    location / {
+        root /var/www/html;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Backend API
+    location /api {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+
+# Enable site
+sudo ln -s /etc/nginx/sites-available/fullstack /etc/nginx/sites-enabled/
+sudo rm /etc/nginx/sites-enabled/default
+
+# Test và restart Nginx
+sudo nginx -t
+sudo systemctl restart nginx
+sudo systemctl enable nginx</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="step-card">
+                        <div class="step-header">
+                            <div class="step-number">Bước 6</div>
+                            <h4 class="step-title">Cài đặt SSL với Let's Encrypt (Optional)</h4>
+                        </div>
+                        <div class="step-content">
+                            <p class="step-description">
+                                Bảo mật ứng dụng với HTTPS miễn phí từ Let's Encrypt.
+                            </p>
+
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span class="code-language">Bash</span>
+                                    <button class="copy-btn" onclick="copyCode(this)">
+                                        <span class="copy-icon">📋</span>
+                                        Copy
+                                    </button>
+                                </div>
+                                <pre><code># Cài đặt Certbot
+sudo apt install -y certbot python3-certbot-nginx
+
+# Lấy SSL certificate
+sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+
+# Auto-renewal (Certbot tự động setup)
+sudo certbot renew --dry-run
+
+# Verify SSL
+sudo systemctl status certbot.timer</code></pre>
+                            </div>
+
+                            <div class="info-box success">
+                                <div class="info-icon">✅</div>
+                                <div class="info-content">
+                                    <strong>Hoàn thành!</strong> Ứng dụng của bạn đã được deploy và chạy trên HTTPS.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Troubleshooting -->
+                <div class="content-block">
+                    <h3 class="block-title">
+                        <span class="title-number">04</span>
+                        Xử lý sự cố thường gặp
+                    </h3>
+
+                    <div class="accordion">
+                        <div class="accordion-item">
+                            <button class="accordion-header">
+                                <span>❌ Không thể kết nối SSH vào EC2</span>
+                                <span class="accordion-icon">+</span>
+                            </button>
+                            <div class="accordion-content">
+                                <ul>
+                                    <li>Kiểm tra Security Group có mở port 22 chưa</li>
+                                    <li>Verify IP của bạn trong whitelist</li>
+                                    <li>Đảm bảo file .pem có quyền 400: <code>chmod 400 your-key.pem</code></li>
+                                    <li>Kiểm tra EC2 instance đang chạy (running state)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <button class="accordion-header">
+                                <span>❌ Backend không chạy sau khi restart server</span>
+                                <span class="accordion-icon">+</span>
+                            </button>
+                            <div class="accordion-content">
+                                <ul>
+                                    <li>Chạy <code>pm2 startup</code> để tạo startup script</li>
+                                    <li>Chạy <code>pm2 save</code> để lưu danh sách process</li>
+                                    <li>Kiểm tra logs: <code>pm2 logs backend</code></li>
+                                    <li>Restart PM2: <code>pm2 restart backend</code></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <button class="accordion-header">
+                                <span>❌ Nginx trả về 502 Bad Gateway</span>
+                                <span class="accordion-icon">+</span>
+                            </button>
+                            <div class="accordion-content">
+                                <ul>
+                                    <li>Kiểm tra backend có đang chạy: <code>pm2 status</code></li>
+                                    <li>Verify port trong Nginx config khớp với backend port</li>
+                                    <li>Check Nginx error logs: <code>sudo tail -f /var/log/nginx/error.log</code></li>
+                                    <li>Test backend trực tiếp: <code>curl http://localhost:3000</code></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <button class="accordion-header">
+                                <span>❌ Frontend không load được API</span>
+                                <span class="accordion-icon">+</span>
+                            </button>
+                            <div class="accordion-content">
+                                <ul>
+                                    <li>Kiểm tra REACT_APP_API_URL trong .env</li>
+                                    <li>Verify CORS settings trong backend</li>
+                                    <li>Check browser console cho errors</li>
+                                    <li>Test API endpoint trực tiếp với Postman/curl</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Best Practices -->
+                <div class="content-block">
+                    <h3 class="block-title">
+                        <span class="title-number">05</span>
+                        Best Practices & Tips
+                    </h3>
+
+                    <div class="tips-grid">
+                        <div class="tip-card">
+                            <div class="tip-icon">🔒</div>
+                            <h4>Security</h4>
+                            <ul>
+                                <li>Luôn dùng HTTPS trong production</li>
+                                <li>Giới hạn SSH access theo IP</li>
+                                <li>Cập nhật system thường xuyên</li>
+                                <li>Dùng IAM roles thay vì hardcode credentials</li>
+                            </ul>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-icon">📊</div>
+                            <h4>Monitoring</h4>
+                            <ul>
+                                <li>Setup CloudWatch alarms cho CPU/Memory</li>
+                                <li>Enable detailed monitoring</li>
+                                <li>Dùng PM2 monitoring: <code>pm2 monit</code></li>
+                                <li>Setup log rotation để tránh đầy disk</li>
+                            </ul>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-icon">💾</div>
+                            <h4>Backup</h4>
+                            <ul>
+                                <li>Tạo AMI snapshot định kỳ</li>
+                                <li>Backup database thường xuyên</li>
+                                <li>Version control cho code</li>
+                                <li>Document deployment process</li>
+                            </ul>
+                        </div>
+
+                        <div class="tip-card">
+                            <div class="tip-icon">⚡</div>
+                            <h4>Performance</h4>
+                            <ul>
+                                <li>Enable Nginx gzip compression</li>
+                                <li>Setup CloudFront CDN cho static files</li>
+                                <li>Optimize images và assets</li>
+                                <li>Implement caching strategies</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cost Optimization -->
+                <div class="content-block">
+                    <h3 class="block-title">
+                        <span class="title-number">06</span>
+                        Tối ưu chi phí
+                    </h3>
+
+                    <div class="cost-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Instance Type</th>
+                                    <th>vCPU</th>
+                                    <th>RAM</th>
+                                    <th>Chi phí/tháng</th>
+                                    <th>Phù hợp cho</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>t2.micro</strong></td>
+                                    <td>1</td>
+                                    <td>1 GB</td>
+                                    <td>$8.50</td>
+                                    <td>Testing, MVP nhỏ</td>
+                                </tr>
+                                <tr class="highlighted">
+                                    <td><strong>t2.small</strong></td>
+                                    <td>1</td>
+                                    <td>2 GB</td>
+                                    <td>$17</td>
+                                    <td>Startup, traffic vừa</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>t2.medium</strong></td>
+                                    <td>2</td>
+                                    <td>4 GB</td>
+                                    <td>$34</td>
+                                    <td>Production nhỏ</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>t3.small</strong></td>
+                                    <td>2</td>
+                                    <td>2 GB</td>
+                                    <td>$15</td>
+                                    <td>Better performance</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box tip">
+                        <div class="info-icon">💰</div>
+                        <div class="info-content">
+                            <strong>Tiết kiệm chi phí:</strong> Dùng Reserved Instances để giảm 30-70% chi phí nếu
+                            commit 1-3 năm.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Other deployment methods (placeholders for now) -->
+            <section id="ecs" class="deployment-section">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <h2 class="section-title">
+                            <span class="title-icon">🐳</span>
+                            ECS / EKS (Docker & Kubernetes)
+                        </h2>
+                        <div class="difficulty-badge medium">Trung bình</div>
+                    </div>
+                    <p class="section-description">
+                        Triển khai ứng dụng với container orchestration. Phù hợp cho microservices và scale lớn.
+                    </p>
+                </div>
+                <div class="coming-soon">
+                    <div class="coming-soon-icon">🚧</div>
+                    <h3>Đang cập nhật...</h3>
+                    <p>Nội dung chi tiết sẽ được thêm vào sớm</p>
+                </div>
+            </section>
+
+            <section id="beanstalk" class="deployment-section">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <h2 class="section-title">
+                            <span class="title-icon">🌱</span>
+                            Elastic Beanstalk
+                        </h2>
+                        <div class="difficulty-badge easy">Dễ dàng</div>
+                    </div>
+                    <p class="section-description">
+                        Platform-as-a-Service của AWS. Deploy nhanh chóng mà không cần quản lý infrastructure.
+                    </p>
+                </div>
+                <div class="coming-soon">
+                    <div class="coming-soon-icon">🚧</div>
+                    <h3>Đang cập nhật...</h3>
+                    <p>Nội dung chi tiết sẽ được thêm vào sớm</p>
+                </div>
+            </section>
+
+            <section id="lambda" class="deployment-section">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <h2 class="section-title">
+                            <span class="title-icon">⚡</span>
+                            Lambda (Serverless)
+                        </h2>
+                        <div class="difficulty-badge medium">Trung bình</div>
+                    </div>
+                    <p class="section-description">
+                        Serverless architecture. Chỉ trả tiền khi code chạy, tự động scale.
+                    </p>
+                </div>
+                <div class="coming-soon">
+                    <div class="coming-soon-icon">🚧</div>
+                    <h3>Đang cập nhật...</h3>
+                    <p>Nội dung chi tiết sẽ được thêm vào sớm</p>
+                </div>
+            </section>
+
+            <section id="codedeploy" class="deployment-section">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <h2 class="section-title">
+                            <span class="title-icon">🚀</span>
+                            CodeDeploy / Pipeline
+                        </h2>
+                        <div class="difficulty-badge hard">Nâng cao</div>
+                    </div>
+                    <p class="section-description">
+                        CI/CD automation với AWS CodePipeline, CodeBuild và CodeDeploy.
+                    </p>
+                </div>
+                <div class="coming-soon">
+                    <div class="coming-soon-icon">🚧</div>
+                    <h3>Đang cập nhật...</h3>
+                    <p>Nội dung chi tiết sẽ được thêm vào sớm</p>
+                </div>
+            </section>
+
+            <section id="iac" class="deployment-section">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <h2 class="section-title">
+                            <span class="title-icon">📜</span>
+                            IaC (CloudFormation / CDK / Terraform)
+                        </h2>
+                        <div class="difficulty-badge hard">Nâng cao</div>
+                    </div>
+                    <p class="section-description">
+                        Infrastructure as Code. Quản lý infrastructure bằng code, version control được.
+                    </p>
+                </div>
+                <div class="coming-soon">
+                    <div class="coming-soon-icon">🚧</div>
+                    <h3>Đang cập nhật...</h3>
+                    <p>Nội dung chi tiết sẽ được thêm vào sớm</p>
+                </div>
+            </section>
+
+            <section id="apprunner" class="deployment-section">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <h2 class="section-title">
+                            <span class="title-icon">🏃</span>
+                            App Runner
+                        </h2>
+                        <div class="difficulty-badge easy">Rất dễ</div>
+                    </div>
+                    <p class="section-description">
+                        Deploy containerized apps cực nhanh. Tự động build, deploy và scale.
+                    </p>
+                </div>
+                <div class="coming-soon">
+                    <div class="coming-soon-icon">🚧</div>
+                    <h3>Đang cập nhật...</h3>
+                    <p>Nội dung chi tiết sẽ được thêm vào sớm</p>
+                </div>
+            </section>
+
+            <section id="opsworks" class="deployment-section">
+                <div class="section-header">
+                    <div class="section-title-wrapper">
+                        <h2 class="section-title">
+                            <span class="title-icon">⚙️</span>
+                            OpsWorks
+                        </h2>
+                        <div class="difficulty-badge hard">Nâng cao</div>
+                    </div>
+                    <p class="section-description">
+                        Configuration management với Chef và Puppet. Phù hợp cho enterprise.
+                    </p>
+                </div>
+                <div class="coming-soon">
+                    <div class="coming-soon-icon">🚧</div>
+                    <h3>Đang cập nhật...</h3>
+                    <p>Nội dung chi tiết sẽ được thêm vào sớm</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>Made with ❤️ for AWS Learners</p>
+                <p class="footer-note">Hướng dẫn này được cập nhật thường xuyên. Bookmark lại để tham khảo!</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
