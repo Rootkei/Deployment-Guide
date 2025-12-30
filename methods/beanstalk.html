@@ -1,10 +1,1351 @@
-<section id="beanstalk" class="deployment-section">
-    <div class="coming-soon">
-        <div class="coming-soon-icon">🚧</div>
-        <h3>Đang cập nhật...</h3>
-        <p>Nội dung chi tiết cho BEANSTALK sẽ được thêm vào sớm</p>
-        <p style="margin-top: 1rem; color: var(--color-text-secondary);">
-            Hãy quay lại sau hoặc theo dõi updates!
+<section id="beanstalk" class="deployment-section active">
+    <div class="section-header">
+        <div class="section-title-wrapper">
+            <h2 class="section-title">
+                <span class="title-icon">🌱</span>
+                Elastic Beanstalk (PaaS)
+            </h2>
+            <div class="difficulty-badge easy">Dễ nhất</div>
+        </div>
+        <p class="section-description">
+            Platform as a Service - AWS quản lý infrastructure tự động.
+            Chỉ cần upload code, Beanstalk lo phần còn lại. Phù hợp cho web apps truyền thống.
         </p>
     </div>
+
+    <!-- Overview Cards -->
+    <div class="overview-grid">
+        <div class="overview-card">
+            <div class="card-icon">💰</div>
+            <h3>Chi phí</h3>
+            <p>$15-60/tháng</p>
+            <span class="card-detail">Chỉ trả cho resources (EC2, RDS)</span>
+        </div>
+        <div class="overview-card">
+            <div class="card-icon">⏱️</div>
+            <h3>Thời gian setup</h3>
+            <p>10-20 phút</p>
+            <span class="card-detail">Nhanh nhất cho web apps</span>
+        </div>
+        <div class="overview-card">
+            <div class="card-icon">📊</div>
+            <h3>Độ phức tạp</h3>
+            <p>Rất thấp</p>
+            <span class="card-detail">Không cần biết DevOps</span>
+        </div>
+        <div class="overview-card">
+            <div class="card-icon">🎯</div>
+            <h3>Phù hợp với</h3>
+            <p>Web Apps</p>
+            <span class="card-detail">Node.js, Python, Java, .NET, PHP, Ruby, Go</span>
+        </div>
+    </div>
+
+    <!-- Architecture Diagram -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">01</span>
+            Kiến trúc tổng quan
+        </h3>
+        <div class="architecture-diagram">
+            <div class="arch-layer">
+                <div class="arch-component user">
+                    <div class="component-icon">👥</div>
+                    <div class="component-label">Users</div>
+                </div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-layer">
+                <div class="arch-component route53">
+                    <div class="component-icon">🌐</div>
+                    <div class="component-label">Route 53</div>
+                    <div class="component-sublabel">DNS</div>
+                </div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-layer">
+                <div class="arch-component">
+                    <div class="component-icon">⚖️</div>
+                    <div class="component-label">Application Load Balancer</div>
+                    <div class="component-sublabel">Auto-created by Beanstalk</div>
+                </div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-layer">
+                <div class="arch-component">
+                    <div class="component-icon">🌱</div>
+                    <div class="component-label">Elastic Beanstalk Environment</div>
+                    <div class="component-sublabel">Managed Platform</div>
+                </div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-layer split">
+                <div class="arch-component ec2">
+                    <div class="component-icon">🖥️</div>
+                    <div class="component-label">EC2 Auto Scaling Group</div>
+                    <div class="component-sublabel">Your Application</div>
+                </div>
+                <div class="arch-component rds">
+                    <div class="component-icon">🗄️</div>
+                    <div class="component-label">RDS Database</div>
+                    <div class="component-sublabel">PostgreSQL / MySQL</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prerequisites -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">02</span>
+            Yêu cầu trước khi bắt đầu
+        </h3>
+        <div class="checklist">
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">Tài khoản AWS đã được kích hoạt</span>
+            </label>
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">AWS CLI đã được cài đặt (optional, cho EB CLI)</span>
+            </label>
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">Code ứng dụng đã sẵn sàng (web application)</span>
+            </label>
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">Hiểu biết cơ bản về web frameworks (Express, Django, Spring, etc.)</span>
+            </label>
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">(Optional) EB CLI đã cài đặt cho deployment tự động</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Step 0: Prepare Application Code -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">00</span>
+            ⚠️ Chuẩn bị Application Code
+        </h3>
+
+        <div class="info-box warning" style="margin-bottom: 2rem;">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <strong>Elastic Beanstalk khác Lambda như thế nào?</strong><br>
+                Beanstalk chạy <strong>traditional web apps</strong> (always-on servers).<br>
+                Không cần viết handler functions, chỉ cần web app bình thường (Express, Django, Spring, etc.).<br>
+                Beanstalk tự động tạo <strong>load balancer, auto-scaling, monitoring</strong>.
+            </div>
+        </div>
+
+        <p style="margin-bottom: 1.5rem;">
+            Chọn platform phù hợp với dự án của bạn. Tất cả các ví dụ dưới đây đều tạo một web application đơn giản.
+        </p>
+
+        <div class="code-tabs">
+            <div class="code-tab-buttons">
+                <button class="code-tab-btn active" data-tab="nodejs-eb">Node.js</button>
+                <button class="code-tab-btn" data-tab="python-eb">Python</button>
+                <button class="code-tab-btn" data-tab="dotnet-eb">.NET</button>
+                <button class="code-tab-btn" data-tab="java-eb">Java</button>
+                <button class="code-tab-btn" data-tab="php-eb">PHP</button>
+                <button class="code-tab-btn" data-tab="ruby-eb">Ruby</button>
+                <button class="code-tab-btn" data-tab="go-eb">Go</button>
+            </div>
+
+            <!-- Node.js Tab -->
+            <div class="code-tab-content active" data-tab="nodejs-eb">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">JavaScript - app.js</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>const express = require('express');
+const app = express();
+const port = process.env.PORT || 8080;
+
+// Middleware
+app.use(express.json());
+
+// Health check endpoint (required by Beanstalk)
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'healthy' });
+});
+
+// Main route
+app.get('/', (req, res) => {
+    res.json({
+        message: 'Hello from Elastic Beanstalk!',
+        platform: 'Node.js',
+        timestamp: new Date().toISOString()
+    });
+});
+
+// API endpoint example
+app.get('/api/users/:id', (req, res) => {
+    res.json({
+        id: req.params.id,
+        name: 'Sample User',
+        email: 'user@example.com'
+    });
+});
+
+// Start server
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">JSON - package.json</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>{
+  "name": "my-beanstalk-app",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "express": "^4.18.0"
+  }
+}</code></pre>
+                </div>
+
+                <div class="info-box tip" style="margin-top: 1rem;">
+                    <div class="info-icon">💡</div>
+                    <div class="info-content">
+                        <strong>Important:</strong> Beanstalk expects your app to listen on
+                        <code>process.env.PORT</code> (default 8080).
+                    </div>
+                </div>
+            </div>
+
+            <!-- Python Tab -->
+            <div class="code-tab-content" data-tab="python-eb">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Python - application.py</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>from flask import Flask, jsonify
+from datetime import datetime
+
+# IMPORTANT: Beanstalk looks for 'application' variable
+application = Flask(__name__)
+
+@application.route('/health')
+def health():
+    """Health check endpoint for Beanstalk"""
+    return jsonify({'status': 'healthy'}), 200
+
+@application.route('/')
+def index():
+    return jsonify({
+        'message': 'Hello from Elastic Beanstalk!',
+        'platform': 'Python/Flask',
+        'timestamp': datetime.now().isoformat()
+    })
+
+@application.route('/api/users/<user_id>')
+def get_user(user_id):
+    return jsonify({
+        'id': user_id,
+        'name': 'Sample User',
+        'email': 'user@example.com'
+    })
+
+if __name__ == '__main__':
+    # Beanstalk uses port 8080 by default
+    application.run(host='0.0.0.0', port=8080)</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">Text - requirements.txt</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>Flask==2.3.0
+gunicorn==21.2.0</code></pre>
+                </div>
+
+                <div class="info-box important" style="margin-top: 1rem;">
+                    <div class="info-icon">⚠️</div>
+                    <div class="info-content">
+                        <strong>Critical:</strong> File MUST be named <code>application.py</code> and Flask app MUST be
+                        named <code>application</code>!
+                    </div>
+                </div>
+            </div>
+
+            <!-- .NET Tab -->
+            <div class="code-tab-content" data-tab="dotnet-eb">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">C# - Program.cs</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>var builder = WebApplication.CreateBuilder(args);
+
+// Configure Kestrel to listen on port 5000 (Beanstalk default for .NET)
+builder.WebHost.UseUrls("http://*:5000");
+
+var app = builder.Build();
+
+// Health check endpoint
+app.MapGet("/health", () => Results.Ok(new { status = "healthy" }));
+
+// Main route
+app.MapGet("/", () => Results.Ok(new
+{
+    message = "Hello from Elastic Beanstalk!",
+    platform = ".NET 8",
+    timestamp = DateTime.UtcNow
+}));
+
+// API endpoint
+app.MapGet("/api/users/{id}", (string id) => Results.Ok(new
+{
+    id = id,
+    name = "Sample User",
+    email = "user@example.com"
+}));
+
+app.Run();</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">XML - MyApp.csproj</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>&lt;Project Sdk="Microsoft.NET.Sdk.Web"&gt;
+  &lt;PropertyGroup&gt;
+    &lt;TargetFramework&gt;net8.0&lt;/TargetFramework&gt;
+    &lt;Nullable&gt;enable&lt;/Nullable&gt;
+    &lt;ImplicitUsings&gt;enable&lt;/ImplicitUsings&gt;
+  &lt;/PropertyGroup&gt;
+&lt;/Project&gt;</code></pre>
+                </div>
+            </div>
+
+            <!-- Java Tab -->
+            <div class="code-tab-content" data-tab="java-eb">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Java - Application.java</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.*;
+import java.time.Instant;
+import java.util.Map;
+
+@SpringBootApplication
+@RestController
+public class Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+    @GetMapping("/health")
+    public Map<String, String> health() {
+        return Map.of("status", "healthy");
+    }
+
+    @GetMapping("/")
+    public Map<String, Object> index() {
+        return Map.of(
+            "message", "Hello from Elastic Beanstalk!",
+            "platform", "Java/Spring Boot",
+            "timestamp", Instant.now().toString()
+        );
+    }
+
+    @GetMapping("/api/users/{id}")
+    public Map<String, String> getUser(@PathVariable String id) {
+        return Map.of(
+            "id", id,
+            "name", "Sample User",
+            "email", "user@example.com"
+        );
+    }
+}</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">YAML - application.yml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>server:
+  port: 5000  # Beanstalk default for Java
+
+spring:
+  application:
+    name: my-beanstalk-app</code></pre>
+                </div>
+            </div>
+
+            <!-- PHP Tab -->
+            <div class="code-tab-content" data-tab="php-eb">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">PHP - index.php</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>&lt;?php
+header('Content-Type: application/json');
+
+$requestUri = $_SERVER['REQUEST_URI'];
+
+// Health check endpoint
+if ($requestUri === '/health') {
+    echo json_encode(['status' => 'healthy']);
+    exit;
+}
+
+// Main route
+if ($requestUri === '/' || $requestUri === '/index.php') {
+    echo json_encode([
+        'message' => 'Hello from Elastic Beanstalk!',
+        'platform' => 'PHP',
+        'timestamp' => date('c')
+    ]);
+    exit;
+}
+
+// API endpoint
+if (preg_match('/^\/api\/users\/(\d+)$/', $requestUri, $matches)) {
+    echo json_encode([
+        'id' => $matches[1],
+        'name' => 'Sample User',
+        'email' => 'user@example.com'
+    ]);
+    exit;
+}
+
+// 404
+http_response_code(404);
+echo json_encode(['error' => 'Not found']);
+?&gt;</code></pre>
+                </div>
+
+                <div class="info-box tip" style="margin-top: 1rem;">
+                    <div class="info-icon">💡</div>
+                    <div class="info-content">
+                        <strong>Tip:</strong> For Laravel apps, upload the entire project and Beanstalk will auto-detect
+                        <code>composer.json</code>.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ruby Tab -->
+            <div class="code-tab-content" data-tab="ruby-eb">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Ruby - config.ru</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>require 'sinatra'
+require 'json'
+
+# Health check endpoint
+get '/health' do
+  content_type :json
+  { status: 'healthy' }.to_json
+end
+
+# Main route
+get '/' do
+  content_type :json
+  {
+    message: 'Hello from Elastic Beanstalk!',
+    platform: 'Ruby/Sinatra',
+    timestamp: Time.now.iso8601
+  }.to_json
+end
+
+# API endpoint
+get '/api/users/:id' do
+  content_type :json
+  {
+    id: params[:id],
+    name: 'Sample User',
+    email: 'user@example.com'
+  }.to_json
+end
+
+run Sinatra::Application</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">Text - Gemfile</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>source 'https://rubygems.org'
+
+gem 'sinatra'
+gem 'puma'</code></pre>
+                </div>
+            </div>
+
+            <!-- Go Tab -->
+            <div class="code-tab-content" data-tab="go-eb">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Go - application.go</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>package main
+
+import (
+    "encoding/json"
+    "fmt"
+    "log"
+    "net/http"
+    "time"
+)
+
+type Response struct {
+    Message   string `json:"message"`
+    Platform  string `json:"platform"`
+    Timestamp string `json:"timestamp"`
+}
+
+type User struct {
+    ID    string `json:"id"`
+    Name  string `json:"name"`
+    Email string `json:"email"`
+}
+
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]string{"status": "healthy"})
+}
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+    response := Response{
+        Message:   "Hello from Elastic Beanstalk!",
+        Platform:  "Go",
+        Timestamp: time.Now().Format(time.RFC3339),
+    }
+    json.NewEncoder(w).Encode(response)
+}
+
+func userHandler(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+    user := User{
+        ID:    r.URL.Path[len("/api/users/"):],
+        Name:  "Sample User",
+        Email: "user@example.com",
+    }
+    json.NewEncoder(w).Encode(user)
+}
+
+func main() {
+    http.HandleFunc("/health", healthHandler)
+    http.HandleFunc("/", indexHandler)
+    http.HandleFunc("/api/users/", userHandler)
+
+    port := "5000" // Beanstalk default for Go
+    fmt.Printf("Server starting on port %s\n", port)
+    log.Fatal(http.ListenAndServe(":"+port, nil))
+}</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">Makefile - Buildfile</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>make: []</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">Text - Procfile</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>web: bin/application</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box success" style="margin-top: 1.5rem;">
+            <div class="info-icon">✅</div>
+            <div class="info-content">
+                <strong>Test local trước khi deploy:</strong><br>
+                Node.js: <code>npm start</code><br>
+                Python: <code>python application.py</code><br>
+                .NET: <code>dotnet run</code><br>
+                Java: <code>./mvnw spring-boot:run</code><br>
+                PHP: <code>php -S localhost:8080</code><br>
+                Ruby: <code>ruby config.ru</code><br>
+                Go: <code>go run application.go</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step by Step Guide -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">03</span>
+            Hướng dẫn triển khai từng bước
+        </h3>
+
+        <!-- Step 1 -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 1</div>
+                <h4 class="step-title">Tạo Elastic Beanstalk Application</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Tạo Beanstalk application và environment. Chọn phương pháp phù hợp với workflow của bạn.
+                </p>
+
+                <div class="code-tabs">
+                    <div class="code-tab-buttons">
+                        <button class="code-tab-btn active" data-tab="console-eb">AWS Console</button>
+                        <button class="code-tab-btn" data-tab="ebcli-eb">EB CLI</button>
+                    </div>
+
+                    <!-- Console Tab -->
+                    <div class="code-tab-content active" data-tab="console-eb">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Hướng dẫn trên Console</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code>1. Vào Elastic Beanstalk Console → Create application
+2. Application name: my-web-app
+3. Platform: Chọn platform phù hợp
+   - Node.js 18
+   - Python 3.11
+   - .NET Core on Linux
+   - Java 17 (Corretto)
+   - PHP 8.2
+   - Ruby 3.2
+   - Go 1.x
+4. Application code:
+   - Sample application (để test)
+   - Hoặc Upload your code (ZIP file)
+5. Configure more options:
+   - Presets: High availability (production)
+   - Instance type: t2.small (hoặc t2.micro cho testing)
+6. Click "Create application"
+7. Đợi 5-10 phút để Beanstalk tạo environment</code></pre>
+                        </div>
+
+                        <div class="info-box tip">
+                            <div class="info-icon">💡</div>
+                            <div class="info-content">
+                                <strong>Tip:</strong> Chọn "High availability" preset để tự động tạo load balancer và
+                                auto-scaling.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EB CLI Tab -->
+                    <div class="code-tab-content" data-tab="ebcli-eb">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - EB CLI</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Install EB CLI
+pip install awsebcli
+
+# Initialize Beanstalk application
+cd my-web-app
+eb init
+
+# Follow prompts:
+# - Region: us-east-1
+# - Application name: my-web-app
+# - Platform: Node.js 18 (hoặc platform khác)
+# - SSH: Yes (để có thể SSH vào instances)
+
+# Create environment
+eb create my-web-app-prod \
+  --instance-type t2.small \
+  --envvars NODE_ENV=production
+
+# Deploy application
+eb deploy
+
+# Open in browser
+eb open
+
+# View logs
+eb logs
+
+# SSH to instance
+eb ssh</code></pre>
+                        </div>
+
+                        <div class="info-box success">
+                            <div class="info-icon">✅</div>
+                            <div class="info-content">
+                                <strong>Recommended:</strong> EB CLI is faster and more repeatable than Console for
+                                production workflows.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 2</div>
+                <h4 class="step-title">Configure Environment</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Cấu hình environment type và scaling. Chọn Web Server (web apps) hoặc Worker (background jobs).
+                </p>
+
+                <div class="code-tabs">
+                    <div class="code-tab-buttons">
+                        <button class="code-tab-btn active" data-tab="webserver-env">Web Server</button>
+                        <button class="code-tab-btn" data-tab="worker-env">Worker</button>
+                    </div>
+
+                    <!-- Web Server Tab -->
+                    <div class="code-tab-content active" data-tab="webserver-env">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - Web Server Environment</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Create .ebextensions/01-environment.config
+mkdir -p .ebextensions
+cat > .ebextensions/01-environment.config << 'EOF'
+option_settings:
+  # Instance configuration
+  aws:autoscaling:launchconfiguration:
+    InstanceType: t2.small
+    IamInstanceProfile: aws-elasticbeanstalk-ec2-role
+    
+  # Auto Scaling
+  aws:autoscaling:asg:
+    MinSize: 2
+    MaxSize: 6
+    
+  # Load Balancer
+  aws:elasticbeanstalk:environment:
+    EnvironmentType: LoadBalanced
+    LoadBalancerType: application
+    
+  # Health check
+  aws:elasticbeanstalk:application:
+    Application Healthcheck URL: /health
+    
+  # Rolling updates
+  aws:autoscaling:updatepolicy:rollingupdate:
+    RollingUpdateEnabled: true
+    MaxBatchSize: 1
+    MinInstancesInService: 1
+EOF</code></pre>
+                        </div>
+
+                        <div class="info-box warning">
+                            <div class="info-icon">⚠️</div>
+                            <div class="info-content">
+                                <strong>Web Server:</strong> For HTTP/HTTPS traffic. Includes load balancer and
+                                auto-scaling.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Worker Tab -->
+                    <div class="code-tab-content" data-tab="worker-env">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - Worker Environment</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Create worker environment
+eb create my-worker-env \
+  --tier worker \
+  --instance-type t2.micro
+
+# Worker configuration (.ebextensions/worker.config)
+cat > .ebextensions/worker.config << 'EOF'
+option_settings:
+  # SQS Queue
+  aws:elasticbeanstalk:sqsd:
+    WorkerQueueURL: https://sqs.us-east-1.amazonaws.com/123456789/my-queue
+    HttpPath: /process-job
+    MimeType: application/json
+    MaxRetries: 3
+    
+  # Auto Scaling for workers
+  aws:autoscaling:asg:
+    MinSize: 1
+    MaxSize: 4
+EOF</code></pre>
+                        </div>
+
+                        <div class="info-box tip">
+                            <div class="info-icon">💡</div>
+                            <div class="info-content">
+                                <strong>Worker:</strong> For background jobs. Automatically pulls messages from SQS
+                                queue.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 3</div>
+                <h4 class="step-title">Deploy Application</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Deploy code lên Beanstalk. Chọn ZIP upload (manual) hoặc Git integration (auto-deploy).
+                </p>
+
+                <div class="code-tabs">
+                    <div class="code-tab-buttons">
+                        <button class="code-tab-btn active" data-tab="zip-deploy">ZIP Upload</button>
+                        <button class="code-tab-btn" data-tab="git-deploy">Git Integration</button>
+                    </div>
+
+                    <!-- ZIP Upload Tab -->
+                    <div class="code-tab-content active" data-tab="zip-deploy">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - ZIP Upload</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Create deployment package
+zip -r app.zip . -x "*.git*" "node_modules/*" "__pycache__/*" "*.pyc"
+
+# Deploy via EB CLI
+eb deploy
+
+# Or upload via Console:
+# 1. Go to Beanstalk Console → Your environment
+# 2. Click "Upload and deploy"
+# 3. Choose app.zip
+# 4. Click "Deploy"
+
+# Check deployment status
+eb status
+
+# View deployment logs
+eb logs --all</code></pre>
+                        </div>
+
+                        <div class="info-box important">
+                            <div class="info-icon">📦</div>
+                            <div class="info-content">
+                                <strong>Important:</strong> Exclude <code>node_modules/</code>, <code>venv/</code>,
+                                <code>.git/</code> from ZIP. Beanstalk will install dependencies automatically.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Git Integration Tab -->
+                    <div class="code-tab-content" data-tab="git-deploy">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - Git Integration</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Setup CodeCommit (AWS Git)
+aws codecommit create-repository --repository-name my-web-app
+
+# Add remote
+git remote add aws https://git-codecommit.us-east-1.amazonaws.com/v1/repos/my-web-app
+
+# Push code
+git push aws main
+
+# Configure Beanstalk to auto-deploy from CodeCommit
+eb init --source codecommit/my-web-app/main
+
+# Or use GitHub Actions for CI/CD
+# .github/workflows/deploy.yml
+cat > .github/workflows/deploy.yml << 'EOF'
+name: Deploy to Elastic Beanstalk
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Generate deployment package
+        run: zip -r deploy.zip . -x '*.git*'
+        
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: my-web-app
+          environment_name: my-web-app-prod
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deploy.zip
+EOF</code></pre>
+                        </div>
+
+                        <div class="info-box success">
+                            <div class="info-icon">✅</div>
+                            <div class="info-content">
+                                <strong>Best Practice:</strong> Use Git integration + GitHub Actions for automated
+                                deployments on every push.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 4</div>
+                <h4 class="step-title">Database Integration (RDS)</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Kết nối Beanstalk với RDS database. Beanstalk tự động inject connection info vào environment
+                    variables.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Bash - Add RDS to Beanstalk</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># Option 1: Add RDS via Console
+# 1. Go to Beanstalk Console → Configuration → Database
+# 2. Click "Edit"
+# 3. Engine: postgres (or mysql)
+# 4. Instance class: db.t3.micro
+# 5. Username: dbadmin
+# 6. Password: your-secure-password
+# 7. Click "Apply"
+
+# Option 2: Add RDS via .ebextensions
+cat > .ebextensions/02-database.config << 'EOF'
+option_settings:
+  aws:rds:dbinstance:
+    DBEngine: postgres
+    DBEngineVersion: 14.7
+    DBInstanceClass: db.t3.micro
+    DBAllocatedStorage: 20
+    DBUser: dbadmin
+    DBPassword: your-secure-password
+    DBDeletionPolicy: Snapshot
+EOF
+
+# Beanstalk auto-creates these environment variables:
+# RDS_HOSTNAME
+# RDS_PORT
+# RDS_DB_NAME
+# RDS_USERNAME
+# RDS_PASSWORD</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">JavaScript - Connect to RDS (Node.js)</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>const { Pool } = require('pg');
+
+// Beanstalk automatically provides these env vars
+const pool = new Pool({
+    host: process.env.RDS_HOSTNAME,
+    port: process.env.RDS_PORT || 5432,
+    database: process.env.RDS_DB_NAME,
+    user: process.env.RDS_USERNAME,
+    password: process.env.RDS_PASSWORD,
+    max: 20,
+    idleTimeoutMillis: 30000
+});
+
+module.exports = pool;</code></pre>
+                </div>
+
+                <div class="info-box warning">
+                    <div class="info-icon">⚠️</div>
+                    <div class="info-content">
+                        <strong>Warning:</strong> RDS created by Beanstalk will be DELETED when you delete the
+                        environment! For production, create RDS separately.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 5</div>
+                <h4 class="step-title">Environment Variables & Secrets</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Quản lý configuration và sensitive data an toàn.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Bash - Set Environment Variables</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># Via EB CLI
+eb setenv NODE_ENV=production \
+  API_KEY=your-api-key \
+  LOG_LEVEL=info
+
+# Via Console:
+# 1. Go to Configuration → Software
+# 2. Edit → Environment properties
+# 3. Add key-value pairs
+# 4. Click "Apply"
+
+# Via .ebextensions
+cat > .ebextensions/03-environment.config << 'EOF'
+option_settings:
+  aws:elasticbeanstalk:application:environment:
+    NODE_ENV: production
+    LOG_LEVEL: info
+EOF</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">Bash - Use Secrets Manager</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># Create secret
+aws secretsmanager create-secret \
+  --name prod/myapp/api-keys \
+  --secret-string '{"API_KEY":"super-secret-key"}'
+
+# Grant Beanstalk permission (.ebextensions/04-iam.config)
+cat > .ebextensions/04-iam.config << 'EOF'
+Resources:
+  AWSEBAutoScalingGroup:
+    Metadata:
+      AWS::CloudFormation::Authentication:
+        S3Auth:
+          type: "s3"
+          buckets: ["elasticbeanstalk-*"]
+          roleName: 
+            "Fn::GetOptionSetting":
+              Namespace: "aws:autoscaling:launchconfiguration"
+              OptionName: "IamInstanceProfile"
+              DefaultValue: "aws-elasticbeanstalk-ec2-role"
+              
+option_settings:
+  aws:elasticbeanstalk:application:environment:
+    SECRET_ARN: arn:aws:secretsmanager:us-east-1:123456789:secret:prod/myapp/api-keys
+EOF</code></pre>
+                </div>
+
+                <div class="info-box important">
+                    <div class="info-icon">🔒</div>
+                    <div class="info-content">
+                        <strong>Security:</strong> NEVER commit secrets to Git! Use Secrets Manager or environment
+                        variables.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 6</div>
+                <h4 class="step-title">Custom Domain & SSL (Optional)</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Sử dụng domain riêng thay vì URL mặc định của Beanstalk.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># Request SSL certificate
+aws acm request-certificate \
+  --domain-name www.yourdomain.com \
+  --validation-method DNS
+
+# Get Load Balancer DNS from Beanstalk
+eb status | grep CNAME
+
+# Create Route 53 record
+aws route53 change-resource-record-sets \
+  --hosted-zone-id Z123456 \
+  --change-batch '{
+    "Changes": [{
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "www.yourdomain.com",
+        "Type": "CNAME",
+        "TTL": 300,
+        "ResourceRecords": [{"Value": "my-env.us-east-1.elasticbeanstalk.com"}]
+      }
+    }]
+  }'
+
+# Add HTTPS listener to Load Balancer (.ebextensions/05-https.config)
+cat > .ebextensions/05-https.config << 'EOF'
+option_settings:
+  aws:elbv2:listener:443:
+    Protocol: HTTPS
+    SSLCertificateArns: arn:aws:acm:us-east-1:123456789:certificate/abc123
+    
+  # Redirect HTTP to HTTPS
+  aws:elasticbeanstalk:environment:process:default:
+    HealthCheckPath: /health
+    Port: 80
+    Protocol: HTTP
+EOF</code></pre>
+                </div>
+
+                <div class="info-box success">
+                    <div class="info-icon">✅</div>
+                    <div class="info-content">
+                        <strong>Hoàn thành!</strong> Ứng dụng của bạn đã chạy trên Beanstalk với custom domain và HTTPS.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Troubleshooting -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">04</span>
+            Xử lý sự cố thường gặp
+        </h3>
+
+        <div class="accordion">
+            <div class="accordion-item">
+                <button class="accordion-header">
+                    Deployment failed
+                    <span class="accordion-icon">+</span>
+                </button>
+                <div class="accordion-content">
+                    <ul>
+                        <li><strong>Nguyên nhân:</strong> Code lỗi, dependencies thiếu, hoặc configuration sai</li>
+                        <li><strong>Giải pháp:</strong>
+                            <ul>
+                                <li>Check logs: <code>eb logs --all</code></li>
+                                <li>Verify package.json/requirements.txt có đúng dependencies</li>
+                                <li>Test local trước: <code>npm start</code> hoặc <code>python application.py</code>
+                                </li>
+                                <li>Check .ebextensions syntax: YAML must be valid</li>
+                                <li>Rollback: <code>eb deploy --version previous-version</code></li>
+                            </ul>
+                        </li>
+                        <li><strong>Debug:</strong> SSH vào instance: <code>eb ssh</code> → check logs in
+                            <code>/var/log/</code></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-header">
+                    Health check failures
+                    <span class="accordion-icon">+</span>
+                </button>
+                <div class="accordion-content">
+                    <ul>
+                        <li><strong>Nguyên nhân:</strong> App không response trên health check endpoint</li>
+                        <li><strong>Giải pháp:</strong>
+                            <ul>
+                                <li>Verify <code>/health</code> endpoint exists và return 200 OK</li>
+                                <li>Check app đang listen trên đúng port (8080 for Node.js, 5000 for .NET/Java)</li>
+                                <li>Increase health check timeout trong .ebextensions</li>
+                                <li>Check security group allows traffic on app port</li>
+                                <li>Test endpoint: <code>curl http://localhost:8080/health</code></li>
+                            </ul>
+                        </li>
+                        <li><strong>Monitor:</strong> CloudWatch → Beanstalk → Health metrics</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-header">
+                    Auto-scaling not working
+                    <span class="accordion-icon">+</span>
+                </button>
+                <div class="accordion-content">
+                    <ul>
+                        <li><strong>Nguyên nhân:</strong> Scaling policies chưa được cấu hình đúng</li>
+                        <li><strong>Giải pháp:</strong>
+                            <ul>
+                                <li>Check MinSize/MaxSize trong .ebextensions</li>
+                                <li>Verify CloudWatch alarms exist (CPU > 70% → scale up)</li>
+                                <li>Check IAM role có quyền auto-scaling</li>
+                                <li>Test manually: Increase load → watch instances scale</li>
+                                <li>Review scaling history: Console → Monitoring → Scaling events</li>
+                            </ul>
+                        </li>
+                        <li><strong>Tip:</strong> Use load testing tool (Apache Bench, k6) to trigger scaling</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Best Practices -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">05</span>
+            Best Practices & Cost Optimization
+        </h3>
+
+        <div class="tips-grid">
+            <div class="tip-card">
+                <div class="tip-icon">⚡</div>
+                <h4>Performance</h4>
+                <ul>
+                    <li>Use .ebextensions for consistent configuration</li>
+                    <li>Enable CloudWatch monitoring</li>
+                    <li>Configure health check timeout appropriately</li>
+                    <li>Use rolling deployments (zero downtime)</li>
+                    <li>Enable X-Ray tracing for debugging</li>
+                </ul>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-icon">🔒</div>
+                <h4>Security</h4>
+                <ul>
+                    <li>Use HTTPS (ACM certificates)</li>
+                    <li>Restrict security groups (only necessary ports)</li>
+                    <li>Use Secrets Manager for credentials</li>
+                    <li>Enable VPC for database isolation</li>
+                    <li>Regular platform updates (managed by Beanstalk)</li>
+                </ul>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-icon">💰</div>
+                <h4>Cost Optimization</h4>
+                <ul>
+                    <li>Right-size instances (start with t2.small)</li>
+                    <li>Use Spot instances for non-critical environments</li>
+                    <li>Set appropriate MinSize (don't over-provision)</li>
+                    <li>Delete unused environments</li>
+                    <li>Monitor costs with Cost Explorer</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </section>
+```

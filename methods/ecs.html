@@ -1,10 +1,1032 @@
-<section id="ecs" class="deployment-section">
-    <div class="coming-soon">
-        <div class="coming-soon-icon">🚧</div>
-        <h3>Đang cập nhật...</h3>
-        <p>Nội dung chi tiết cho ECS sẽ được thêm vào sớm</p>
-        <p style="margin-top: 1rem; color: var(--color-text-secondary);">
-            Hãy quay lại sau hoặc theo dõi updates!
+<section id="ecs" class="deployment-section active">
+    <div class="section-header">
+        <div class="section-title-wrapper">
+            <h2 class="section-title">
+                <span class="title-icon">🐳</span>
+                ECS / EKS (Containers)
+            </h2>
+            <div class="difficulty-badge medium">Trung bình</div>
+        </div>
+        <p class="section-description">
+            Triển khai ứng dụng với Docker containers, tự động scale và quản lý.
+            Phù hợp cho microservices và ứng dụng production hiện đại.
         </p>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="overview-grid">
+        <div class="overview-card">
+            <div class="card-icon">💰</div>
+            <h3>Chi phí</h3>
+            <p>$20-100/tháng</p>
+            <span class="card-detail">Fargate: cao hơn, EC2: rẻ hơn</span>
+        </div>
+        <div class="overview-card">
+            <div class="card-icon">⏱️</div>
+            <h3>Thời gian setup</h3>
+            <p>45-90 phút</p>
+            <span class="card-detail">Lần đầu tiên</span>
+        </div>
+        <div class="overview-card">
+            <div class="card-icon">📊</div>
+            <h3>Độ phức tạp</h3>
+            <p>Trung bình-Cao</p>
+            <span class="card-detail">Cần hiểu Docker & containers</span>
+        </div>
+        <div class="overview-card">
+            <div class="card-icon">🎯</div>
+            <h3>Phù hợp với</h3>
+            <p>Microservices</p>
+            <span class="card-detail">Production, scalable apps</span>
+        </div>
+    </div>
+
+    <!-- Architecture Diagram -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">01</span>
+            Kiến trúc tổng quan
+        </h3>
+        <div class="architecture-diagram">
+            <div class="arch-layer">
+                <div class="arch-component user">
+                    <div class="component-icon">👥</div>
+                    <div class="component-label">Users</div>
+                </div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-layer">
+                <div class="arch-component route53">
+                    <div class="component-icon">🌐</div>
+                    <div class="component-label">Route 53</div>
+                    <div class="component-sublabel">DNS</div>
+                </div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-layer">
+                <div class="arch-component">
+                    <div class="component-icon">⚖️</div>
+                    <div class="component-label">Application Load Balancer</div>
+                    <div class="component-sublabel">ALB</div>
+                </div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-layer">
+                <div class="arch-component">
+                    <div class="component-icon">🐳</div>
+                    <div class="component-label">ECS/EKS Cluster</div>
+                    <div class="component-sublabel">Container Orchestration</div>
+                </div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-layer split">
+                <div class="arch-component nginx">
+                    <div class="component-icon">📦</div>
+                    <div class="component-label">Frontend Container</div>
+                    <div class="component-sublabel">Nginx + React/Vue</div>
+                </div>
+                <div class="arch-component nodejs">
+                    <div class="component-icon">🔧</div>
+                    <div class="component-label">Backend Container</div>
+                    <div class="component-sublabel">API Service</div>
+                </div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-layer">
+                <div class="arch-component rds">
+                    <div class="component-icon">🗄️</div>
+                    <div class="component-label">Database</div>
+                    <div class="component-sublabel">RDS / DynamoDB</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prerequisites -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">02</span>
+            Yêu cầu trước khi bắt đầu
+        </h3>
+        <div class="checklist">
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">Tài khoản AWS đã được kích hoạt</span>
+            </label>
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">Docker đã cài đặt trên máy local</span>
+            </label>
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">AWS CLI đã được cài đặt và cấu hình</span>
+            </label>
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">Hiểu biết cơ bản về Docker và containers</span>
+            </label>
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">Ứng dụng đã test được trong Docker container local</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Step 0 - Preparation -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">00</span>
+            ⚠️ Chuẩn bị Dockerfile (QUAN TRỌNG!)
+        </h3>
+
+        <div class="info-box warning">
+            <div class="info-icon">🚨</div>
+            <div class="info-content">
+                <strong>DỪNG LẠI!</strong> Trước khi deploy lên ECS/EKS, bạn PHẢI có Dockerfile hoạt động tốt.
+                Container phải chạy được trên local trước!
+            </div>
+        </div>
+
+        <div class="tips-grid">
+            <div class="tip-card">
+                <div class="tip-icon">🐳</div>
+                <h4>Dockerfile Requirements</h4>
+                <ul>
+                    <li>✅ Dockerfile đã được tạo và test</li>
+                    <li>✅ Container chạy được trên local: <code>docker run</code></li>
+                    <li>✅ Expose đúng port (ví dụ: 3000, 8080)</li>
+                    <li>✅ Environment variables được định nghĩa</li>
+                    <li>✅ Health check endpoint (ví dụ: <code>/health</code>)</li>
+                </ul>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-icon">✅</div>
+                <h4>Best Practices</h4>
+                <ul>
+                    <li>✅ Dùng multi-stage builds để giảm image size</li>
+                    <li>✅ Dùng base image nhẹ (alpine, distroless)</li>
+                    <li>✅ Không chạy container as root user</li>
+                    <li>✅ .dockerignore để loại trừ files không cần</li>
+                    <li>✅ Tag images với version cụ thể</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="info-box tip">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <strong>Pro tip:</strong> Test container local trước:<br>
+                <code>docker build -t myapp .</code><br>
+                <code>docker run -p 3000:3000 myapp</code><br>
+                Mở <code>http://localhost:3000</code> → Phải hoạt động!
+            </div>
+        </div>
+    </div>
+
+    <!-- Step by Step Guide -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">03</span>
+            Hướng dẫn triển khai từng bước
+        </h3>
+
+        <!-- Step 1: Create Docker Images -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 1</div>
+                <h4 class="step-title">Tạo & Push Docker Images lên ECR</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Tạo Dockerfile cho ứng dụng, build image, và push lên Amazon ECR (Elastic Container Registry).
+                </p>
+
+                <h5 style="margin-top: 1.5rem; margin-bottom: 1rem; color: var(--color-text-primary);">
+                    📝 Dockerfile Examples (Multi-Framework)
+                </h5>
+
+                <div class="code-tabs">
+                    <div class="code-tab-buttons">
+                        <button class="code-tab-btn active" data-tab="nodejs-docker">Node.js</button>
+                        <button class="code-tab-btn" data-tab="dotnet-docker">C# / .NET</button>
+                        <button class="code-tab-btn" data-tab="java-docker">Java / Spring</button>
+                        <button class="code-tab-btn" data-tab="python-docker">Python / Django</button>
+                        <button class="code-tab-btn" data-tab="golang-docker">Go</button>
+                    </div>
+
+                    <!-- Node.js Dockerfile -->
+                    <div class="code-tab-content active" data-tab="nodejs-docker">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Dockerfile - Node.js (Multi-stage)</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Build stage
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+
+# Production stage
+FROM node:18-alpine
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+# Copy from builder
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --chown=nodejs:nodejs . .
+
+# Switch to non-root user
+USER nodejs
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Start app
+CMD ["node", "server.js"]</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- .NET Dockerfile -->
+                    <div class="code-tab-content" data-tab="dotnet-docker">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Dockerfile - C# / .NET</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Build stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["YourApp.csproj", "./"]
+RUN dotnet restore
+COPY . .
+RUN dotnet publish -c Release -o /app/publish
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup -g 1001 -S dotnet && \
+    adduser -S dotnet -u 1001 -G dotnet
+
+COPY --from=build --chown=dotnet:dotnet /app/publish .
+
+USER dotnet
+
+EXPOSE 5000
+
+ENV ASPNETCORE_URLS=http://+:5000
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:5000/health || exit 1
+
+ENTRYPOINT ["dotnet", "YourApp.dll"]</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Java Dockerfile -->
+                    <div class="code-tab-content" data-tab="java-docker">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Dockerfile - Java / Spring Boot</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Build stage
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+# Runtime stage
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+
+# Create non-root user
+RUN addgroup -g 1001 -S spring && \
+    adduser -S spring -u 1001 -G spring
+
+COPY --from=build --chown=spring:spring /app/target/*.jar app.jar
+
+USER spring
+
+EXPOSE 8080
+
+ENV JAVA_OPTS="-Xmx512m -Xms256m"
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Python Dockerfile -->
+                    <div class="code-tab-content" data-tab="python-docker">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Dockerfile - Python / Django</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Build stage
+FROM python:3.11-slim AS builder
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+# Runtime stage
+FROM python:3.11-slim
+WORKDIR /app
+
+# Create non-root user
+RUN useradd -m -u 1001 django
+
+# Copy dependencies from builder
+COPY --from=builder /root/.local /home/django/.local
+COPY --chown=django:django . .
+
+# Make sure scripts are executable
+ENV PATH=/home/django/.local/bin:$PATH
+
+USER django
+
+EXPOSE 8000
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()"
+
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "myproject.wsgi:application"]</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Go Dockerfile -->
+                    <div class="code-tab-content" data-tab="golang-docker">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Dockerfile - Go</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Build stage
+FROM golang:1.21-alpine AS builder
+WORKDIR /app
+
+# Copy go mod files
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build binary
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+
+# Runtime stage (distroless for minimal size)
+FROM gcr.io/distroless/static-debian11
+WORKDIR /app
+
+# Copy binary from builder
+COPY --from=builder /app/main .
+
+# Expose port
+EXPOSE 8080
+
+# Health check will be done at ECS task definition level
+
+# Run binary
+CMD ["./main"]</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--color-text-primary);">
+                    🚀 Build & Push to ECR
+                </h5>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Bash - ECR Setup & Push</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># 1. Create ECR repository
+aws ecr create-repository \
+    --repository-name my-app \
+    --region us-east-1
+
+# 2. Get ECR login credentials
+aws ecr get-login-password --region us-east-1 | \
+    docker login --username AWS --password-stdin \
+    123456789012.dkr.ecr.us-east-1.amazonaws.com
+
+# 3. Build Docker image
+docker build -t my-app:latest .
+
+# 4. Tag image for ECR
+docker tag my-app:latest \
+    123456789012.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
+
+# 5. Push to ECR
+docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
+
+# 6. Verify image in ECR
+aws ecr describe-images \
+    --repository-name my-app \
+    --region us-east-1</code></pre>
+                </div>
+
+                <div class="info-box tip">
+                    <div class="info-icon">💡</div>
+                    <div class="info-content">
+                        <strong>Pro tip:</strong> Test image locally trước khi push:<br>
+                        <code>docker run -p 3000:3000 my-app:latest</code><br>
+                        Đảm bảo container chạy OK trước khi deploy lên ECS!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Create ECS/EKS Cluster -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 2</div>
+                <h4 class="step-title">Tạo ECS/EKS Cluster</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Tạo cluster để chạy containers. Chọn giữa ECS Fargate (serverless, recommended) hoặc EKS
+                    (Kubernetes).
+                </p>
+
+                <div class="code-tabs">
+                    <div class="code-tab-buttons">
+                        <button class="code-tab-btn active" data-tab="ecs-fargate">ECS Fargate (Recommended)</button>
+                        <button class="code-tab-btn" data-tab="ecs-ec2">ECS EC2</button>
+                        <button class="code-tab-btn" data-tab="eks">EKS (Kubernetes)</button>
+                    </div>
+
+                    <!-- ECS Fargate -->
+                    <div class="code-tab-content active" data-tab="ecs-fargate">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - ECS Fargate Cluster</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Create ECS cluster (Fargate - serverless)
+aws ecs create-cluster \
+    --cluster-name my-app-cluster \
+    --capacity-providers FARGATE FARGATE_SPOT \
+    --default-capacity-provider-strategy \
+        capacityProvider=FARGATE,weight=1 \
+        capacityProvider=FARGATE_SPOT,weight=1 \
+    --region us-east-1
+
+# Verify cluster
+aws ecs describe-clusters \
+    --clusters my-app-cluster \
+    --region us-east-1</code></pre>
+                        </div>
+
+                        <div class="info-box success">
+                            <div class="info-icon">✅</div>
+                            <div class="info-content">
+                                <strong>Fargate Benefits:</strong><br>
+                                ✅ Không cần quản lý EC2 instances<br>
+                                ✅ Tự động scale<br>
+                                ✅ Chỉ trả tiền cho resources sử dụng<br>
+                                ✅ Dễ dàng cho beginners
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ECS EC2 -->
+                    <div class="code-tab-content" data-tab="ecs-ec2">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - ECS EC2 Cluster</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Create ECS cluster with EC2 launch type
+aws ecs create-cluster \
+    --cluster-name my-app-cluster-ec2 \
+    --region us-east-1
+
+# Note: Cần tạo Auto Scaling Group với EC2 instances
+# và register vào cluster (phức tạp hơn Fargate)</code></pre>
+                        </div>
+
+                        <div class="info-box warning">
+                            <div class="info-icon">⚠️</div>
+                            <div class="info-content">
+                                <strong>EC2 Launch Type:</strong><br>
+                                ⚠️ Cần quản lý EC2 instances<br>
+                                ⚠️ Phức tạp hơn Fargate<br>
+                                ✅ Rẻ hơn cho workloads lớn<br>
+                                ✅ Nhiều control hơn
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EKS -->
+                    <div class="code-tab-content" data-tab="eks">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - EKS Cluster (Kubernetes)</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Install eksctl (if not installed)
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+sudo mv /tmp/eksctl /usr/local/bin
+
+# Create EKS cluster with Fargate
+eksctl create cluster \
+    --name my-app-cluster \
+    --region us-east-1 \
+    --fargate
+
+# Configure kubectl
+aws eks update-kubeconfig \
+    --region us-east-1 \
+    --name my-app-cluster
+
+# Verify cluster
+kubectl get nodes</code></pre>
+                        </div>
+
+                        <div class="info-box important">
+                            <div class="info-icon">📘</div>
+                            <div class="info-content">
+                                <strong>EKS (Kubernetes):</strong><br>
+                                ✅ Full Kubernetes features<br>
+                                ✅ Portable (không bị lock-in AWS)<br>
+                                ⚠️ Phức tạp hơn ECS<br>
+                                ⚠️ Cần học Kubernetes<br>
+                                💰 Cluster cost: $0.10/hour (~$73/month)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Create Task Definition -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 3</div>
+                <h4 class="step-title">Tạo Task Definition (ECS) / Deployment (EKS)</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Định nghĩa cách container sẽ chạy: image, resources, environment variables, ports.
+                </p>
+
+                <div class="code-tabs">
+                    <div class="code-tab-buttons">
+                        <button class="code-tab-btn active" data-tab="ecs-task">ECS Task Definition</button>
+                        <button class="code-tab-btn" data-tab="eks-deploy">EKS Deployment</button>
+                    </div>
+
+                    <!-- ECS Task Definition -->
+                    <div class="code-tab-content active" data-tab="ecs-task">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">JSON - ECS Task Definition</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code>{
+  "family": "my-app-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "my-app",
+      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/my-app:latest",
+      "cpu": 512,
+      "memory": 1024,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/my-app",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+}</code></pre>
+                        </div>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - Register Task Definition</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Save JSON above as task-definition.json
+
+# Register task definition
+aws ecs register-task-definition \
+    --cli-input-json file://task-definition.json \
+    --region us-east-1
+
+# Verify
+aws ecs describe-task-definition \
+    --task-definition my-app-task \
+    --region us-east-1</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- EKS Deployment -->
+                    <div class="code-tab-content" data-tab="eks-deploy">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">YAML - Kubernetes Deployment</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+  labels:
+    app: my-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-app
+        image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-service
+spec:
+  selector:
+    app: my-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+  type: LoadBalancer</code></pre>
+                        </div>
+
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - Deploy to EKS</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Save YAML above as deployment.yaml
+
+# Apply deployment
+kubectl apply -f deployment.yaml
+
+# Check status
+kubectl get deployments
+kubectl get pods
+kubectl get services</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box tip">
+                    <div class="info-icon">💡</div>
+                    <div class="info-content">
+                        <strong>Resource Allocation Tips:</strong><br>
+                        • Small app: 512 CPU, 1024 MB memory<br>
+                        • Medium app: 1024 CPU, 2048 MB memory<br>
+                        • Large app: 2048 CPU, 4096 MB memory
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Create Load Balancer -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 4</div>
+                <h4 class="step-title">Tạo Application Load Balancer</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Tạo ALB để distribute traffic đến containers.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Bash - Create ALB</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># Create ALB
+aws elbv2 create-load-balancer \
+    --name my-app-alb \
+    --subnets subnet-12345 subnet-67890 \
+    --security-groups sg-12345 \
+    --region us-east-1
+
+# Create target group
+aws elbv2 create-target-group \
+    --name my-app-tg \
+    --protocol HTTP \
+    --port 3000 \
+    --vpc-id vpc-12345 \
+    --target-type ip \
+    --health-check-path /health \
+    --region us-east-1
+
+# Create listener
+aws elbv2 create-listener \
+    --load-balancer-arn arn:aws:elasticloadbalancing:... \
+    --protocol HTTP \
+    --port 80 \
+    --default-actions Type=forward,TargetGroupArn=arn:aws:elasticloadbalancing:...</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Create ECS Service -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 5</div>
+                <h4 class="step-title">Tạo ECS Service</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Deploy và maintain containers với auto-scaling.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Bash - Create ECS Service</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># Create ECS service
+aws ecs create-service \
+    --cluster my-app-cluster \
+    --service-name my-app-service \
+    --task-definition my-app-task \
+    --desired-count 2 \
+    --launch-type FARGATE \
+    --network-configuration "awsvpcConfiguration={subnets=[subnet-12345,subnet-67890],securityGroups=[sg-12345],assignPublicIp=ENABLED}" \
+    --load-balancers "targetGroupArn=arn:aws:elasticloadbalancing:...,containerName=my-app,containerPort=3000" \
+    --region us-east-1
+
+# Verify service
+aws ecs describe-services \
+    --cluster my-app-cluster \
+    --services my-app-service \
+    --region us-east-1</code></pre>
+                </div>
+
+                <div class="info-box success">
+                    <div class="info-icon">✅</div>
+                    <div class="info-content">
+                        <strong>Hoàn thành!</strong> Ứng dụng đã chạy trên ECS/EKS với auto-scaling và load balancing.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6: Domain & SSL (Optional) -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 6</div>
+                <h4 class="step-title">Cấu hình Domain & SSL (Optional)</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Setup custom domain và HTTPS với ACM certificate.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Bash - Domain & SSL Setup</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># 1. Request SSL certificate
+aws acm request-certificate \
+    --domain-name myapp.com \
+    --validation-method DNS \
+    --region us-east-1
+
+# 2. Create Route 53 record
+aws route53 change-resource-record-sets \
+    --hosted-zone-id Z1234567890ABC \
+    --change-batch file://dns-record.json
+
+# 3. Add HTTPS listener to ALB
+aws elbv2 create-listener \
+    --load-balancer-arn arn:aws:elasticloadbalancing:... \
+    --protocol HTTPS \
+    --port 443 \
+    --certificates CertificateArn=arn:aws:acm:... \
+    --default-actions Type=forward,TargetGroupArn=arn:aws:elasticloadbalancing:...</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Troubleshooting -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">04</span>
+            Xử lý sự cố thường gặp
+        </h3>
+
+        <div class="accordion">
+            <div class="accordion-item">
+                <button class="accordion-header">
+                    Container không start được
+                    <span class="accordion-icon">+</span>
+                </button>
+                <div class="accordion-content">
+                    <ul>
+                        <li>Check CloudWatch Logs: <code>aws logs tail /ecs/my-app --follow</code></li>
+                        <li>Verify image exists trong ECR</li>
+                        <li>Check task definition có đúng image URI không</li>
+                        <li>Verify IAM role có quyền pull image từ ECR</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-header">
+                    Health check failures
+                    <span class="accordion-icon">+</span>
+                </button>
+                <div class="accordion-content">
+                    <ul>
+                        <li>Verify health check endpoint exists: <code>/health</code></li>
+                        <li>Check container logs để xem app có start được không</li>
+                        <li>Tăng <code>startPeriod</code> nếu app cần thời gian khởi động lâu</li>
+                        <li>Test health check local: <code>curl http://localhost:3000/health</code></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-header">
+                    Service không scale
+                    <span class="accordion-icon">+</span>
+                </button>
+                <div class="accordion-content">
+                    <ul>
+                        <li>Check service events: <code>aws ecs describe-services</code></li>
+                        <li>Verify có đủ resources (CPU, memory) trong cluster</li>
+                        <li>Check subnet có đủ IP addresses không</li>
+                        <li>Verify security group rules cho phép traffic</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Best Practices -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">05</span>
+            Best Practices & Cost Optimization
+        </h3>
+
+        <div class="tips-grid">
+            <div class="tip-card">
+                <div class="tip-icon">🔒</div>
+                <h4>Security</h4>
+                <ul>
+                    <li>Dùng non-root user trong container</li>
+                    <li>Scan images với AWS ECR scanning</li>
+                    <li>Dùng Secrets Manager cho sensitive data</li>
+                    <li>Restrict security group rules</li>
+                </ul>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-icon">⚡</div>
+                <h4>Performance</h4>
+                <ul>
+                    <li>Dùng multi-stage builds để giảm image size</li>
+                    <li>Enable container insights cho monitoring</li>
+                    <li>Set appropriate resource limits</li>
+                    <li>Use health checks để detect failures sớm</li>
+                </ul>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-icon">💰</div>
+                <h4>Cost Optimization</h4>
+                <ul>
+                    <li>Dùng Fargate Spot cho non-critical workloads</li>
+                    <li>Right-size containers (đừng over-provision)</li>
+                    <li>Enable auto-scaling để scale down khi idle</li>
+                    <li>Delete unused ECR images</li>
+                </ul>
+            </div>
+        </div>
     </div>
 </section>

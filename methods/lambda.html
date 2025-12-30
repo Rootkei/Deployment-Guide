@@ -1,10 +1,1459 @@
-<section id="lambda" class="deployment-section">
-    <div class="coming-soon">
-        <div class="coming-soon-icon">🚧</div>
-        <h3>Đang cập nhật...</h3>
-        <p>Nội dung chi tiết cho LAMBDA sẽ được thêm vào sớm</p>
-        <p style="margin-top: 1rem; color: var(--color-text-secondary);">
-            Hãy quay lại sau hoặc theo dõi updates!
+<section id="lambda" class="deployment-section active">
+    <div class="section-header">
+        <div class="section-title-wrapper">
+            <h2 class="section-title">
+                <span class="title-icon">⚡</span>
+                Lambda (Serverless)
+            </h2>
+            <div class="difficulty-badge easy">Dễ scale</div>
+        </div>
+        <p class="section-description">
+            Chạy code không cần quản lý server. Chỉ trả tiền khi code chạy.
+            Phù hợp cho API, xử lý sự kiện, và ứng dụng có traffic thấp-trung bình.
         </p>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="overview-grid">
+        <div class="overview-card">
+            <div class="card-icon">💰</div>
+            <h3>Chi phí</h3>
+            <p>$0-20/tháng</p>
+            <span class="card-detail">Free tier: 1M requests/tháng</span>
+        </div>
+        <div class="overview-card">
+            <div class="card-icon">⏱️</div>
+            <h3>Thời gian setup</h3>
+            <p>15-30 phút</p>
+            <span class="card-detail">Nhanh nhất</span>
+        </div>
+        <div class="overview-card">
+            <div class="card-icon">📊</div>
+            <h3>Độ phức tạp</h3>
+            <p>Thấp-Trung bình</p>
+            <span class="card-detail">Không cần quản lý server</span>
+        </div>
+        <div class="overview-card">
+            <div class="card-icon">🎯</div>
+            <h3>Phù hợp với</h3>
+            <p>API, Event-driven</p>
+            <span class="card-detail">Microservices, automation</span>
+        </div>
+    </div>
+
+    <!-- Architecture Diagram -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">01</span>
+            Kiến trúc tổng quan
+        </h3>
+        <div class="architecture-diagram">
+            <div class="arch-layer">
+                <div class="arch-component user">
+                    <div class="component-icon">👥</div>
+                    <div class="component-label">Users</div>
+                </div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-layer">
+                <div class="arch-component route53">
+                    <div class="component-icon">🌐</div>
+                    <div class="component-label">Route 53</div>
+                    <div class="component-sublabel">DNS (Optional)</div>
+                </div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-layer">
+                <div class="arch-component">
+                    <div class="component-icon">🚪</div>
+                    <div class="component-label">API Gateway</div>
+                    <div class="component-sublabel">REST / HTTP API</div>
+                </div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-layer">
+                <div class="arch-component">
+                    <div class="component-icon">⚡</div>
+                    <div class="component-label">Lambda Functions</div>
+                    <div class="component-sublabel">Serverless Compute</div>
+                </div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-layer split">
+                <div class="arch-component">
+                    <div class="component-icon">🗄️</div>
+                    <div class="component-label">DynamoDB</div>
+                    <div class="component-sublabel">NoSQL Database</div>
+                </div>
+                <div class="arch-component rds">
+                    <div class="component-icon">🐘</div>
+                    <div class="component-label">RDS Proxy</div>
+                    <div class="component-sublabel">SQL Database</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prerequisites -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">02</span>
+            Yêu cầu trước khi bắt đầu
+        </h3>
+        <div class="checklist">
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">Tài khoản AWS đã được kích hoạt</span>
+            </label>
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">AWS CLI đã được cài đặt và cấu hình</span>
+            </label>
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">Hiểu biết cơ bản về REST API</span>
+            </label>
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">Code ứng dụng đã sẵn sàng (API handlers)</span>
+            </label>
+            <label class="checklist-item">
+                <input type="checkbox" class="checklist-checkbox">
+                <span class="checklist-text">(Optional) SAM CLI hoặc Serverless Framework đã cài đặt</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Step 0: Prepare Function Code -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">00</span>
+            ⚠️ Chuẩn bị Lambda Function Code
+        </h3>
+
+        <div class="info-box warning" style="margin-bottom: 2rem;">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <strong>Lambda khác EC2/ECS như thế nào?</strong><br>
+                Lambda chạy code theo <strong>event-driven</strong> (khi có request mới chạy).<br>
+                Bạn viết <strong>handler function</strong>, không phải web server như Express/Flask.<br>
+                Code phải <strong>stateless</strong> (không lưu trữ dữ liệu giữa các lần chạy).
+            </div>
+        </div>
+
+        <p style="margin-bottom: 1.5rem;">
+            Chọn runtime phù hợp với dự án của bạn. Tất cả các ví dụ dưới đây đều tạo một API endpoint đơn giản.
+        </p>
+
+        <div class="code-tabs">
+            <div class="code-tab-buttons">
+                <button class="code-tab-btn active" data-tab="nodejs-lambda">Node.js</button>
+                <button class="code-tab-btn" data-tab="python-lambda">Python</button>
+                <button class="code-tab-btn" data-tab="dotnet-lambda">.NET (C#)</button>
+                <button class="code-tab-btn" data-tab="java-lambda">Java</button>
+                <button class="code-tab-btn" data-tab="go-lambda">Go</button>
+            </div>
+
+            <!-- Node.js Tab -->
+            <div class="code-tab-content active" data-tab="nodejs-lambda">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">JavaScript - index.js</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>// Lambda handler function
+exports.handler = async (event) => {
+    console.log('Event:', JSON.stringify(event, null, 2));
+    
+    // Parse request body (if POST/PUT)
+    const body = event.body ? JSON.parse(event.body) : {};
+    
+    // Example: Get user from database
+    const userId = event.pathParameters?.id;
+    
+    // Your business logic here
+    const response = {
+        message: 'Hello from Lambda!',
+        userId: userId,
+        timestamp: new Date().toISOString()
+    };
+    
+    return {
+        statusCode: 200,
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*' // CORS
+        },
+        body: JSON.stringify(response)
+    };
+};
+
+// For local testing
+if (require.main === module) {
+    const testEvent = {
+        pathParameters: { id: '123' },
+        body: JSON.stringify({ name: 'Test' })
+    };
+    exports.handler(testEvent).then(console.log);
+}</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">JSON - package.json</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>{
+  "name": "my-lambda-function",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "^2.1000.0"
+  }
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Python Tab -->
+            <div class="code-tab-content" data-tab="python-lambda">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Python - lambda_function.py</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>import json
+import boto3
+from datetime import datetime
+
+# Initialize AWS SDK clients
+dynamodb = boto3.resource('dynamodb')
+
+def lambda_handler(event, context):
+    """
+    Lambda handler function
+    event: API Gateway event object
+    context: Lambda context object
+    """
+    print(f"Event: {json.dumps(event)}")
+    
+    # Parse request
+    http_method = event.get('httpMethod', 'GET')
+    path_params = event.get('pathParameters', {})
+    body = json.loads(event.get('body', '{}'))
+    
+    # Your business logic here
+    user_id = path_params.get('id')
+    
+    response_body = {
+        'message': 'Hello from Lambda!',
+        'userId': user_id,
+        'timestamp': datetime.now().isoformat()
+    }
+    
+    return {
+        'statusCode': 200,
+        'headers': {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'  # CORS
+        },
+        'body': json.dumps(response_body)
+    }
+
+# For local testing
+if __name__ == '__main__':
+    test_event = {
+        'httpMethod': 'GET',
+        'pathParameters': {'id': '123'},
+        'body': json.dumps({'name': 'Test'})
+    }
+    result = lambda_handler(test_event, None)
+    print(result)</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">Text - requirements.txt</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>boto3==1.26.0
+requests==2.28.0</code></pre>
+                </div>
+            </div>
+
+            <!-- .NET Tab -->
+            <div class="code-tab-content" data-tab="dotnet-lambda">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">C# - Function.cs</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>using Amazon.Lambda.Core;
+using Amazon.Lambda.APIGatewayEvents;
+using System.Text.Json;
+
+// Assembly attribute to enable Lambda JSON serializer
+[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
+
+namespace MyLambdaFunction;
+
+public class Function
+{
+    public APIGatewayProxyResponse FunctionHandler(
+        APIGatewayProxyRequest request, 
+        ILambdaContext context)
+    {
+        context.Logger.LogInformation($"Request: {JsonSerializer.Serialize(request)}");
+        
+        // Parse request
+        var userId = request.PathParameters?.GetValueOrDefault("id");
+        var body = request.Body != null 
+            ? JsonSerializer.Deserialize<Dictionary<string, object>>(request.Body) 
+            : new Dictionary<string, object>();
+        
+        // Your business logic here
+        var response = new
+        {
+            message = "Hello from Lambda!",
+            userId = userId,
+            timestamp = DateTime.UtcNow.ToString("o")
+        };
+        
+        return new APIGatewayProxyResponse
+        {
+            StatusCode = 200,
+            Headers = new Dictionary<string, string>
+            {
+                { "Content-Type", "application/json" },
+                { "Access-Control-Allow-Origin", "*" }
+            },
+            Body = JsonSerializer.Serialize(response)
+        };
+    }
+}</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">XML - MyLambdaFunction.csproj</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>&lt;Project Sdk="Microsoft.NET.Sdk"&gt;
+  &lt;PropertyGroup&gt;
+    &lt;TargetFramework&gt;net8.0&lt;/TargetFramework&gt;
+    &lt;GenerateRuntimeConfigurationFiles&gt;true&lt;/GenerateRuntimeConfigurationFiles&gt;
+    &lt;AWSProjectType&gt;Lambda&lt;/AWSProjectType&gt;
+  &lt;/PropertyGroup&gt;
+  &lt;ItemGroup&gt;
+    &lt;PackageReference Include="Amazon.Lambda.Core" Version="2.2.0" /&gt;
+    &lt;PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="2.6.0" /&gt;
+    &lt;PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.4.0" /&gt;
+  &lt;/ItemGroup&gt;
+&lt;/Project&gt;</code></pre>
+                </div>
+            </div>
+
+            <!-- Java Tab -->
+            <div class="code-tab-content" data-tab="java-lambda">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Java - Handler.java</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>package com.example;
+
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
+import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.google.gson.Gson;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Handler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+    
+    private final Gson gson = new Gson();
+    
+    @Override
+    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
+        context.getLogger().log("Request: " + gson.toJson(request));
+        
+        // Parse request
+        String userId = request.getPathParameters() != null 
+            ? request.getPathParameters().get("id") 
+            : null;
+        
+        // Your business logic here
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("message", "Hello from Lambda!");
+        responseBody.put("userId", userId);
+        responseBody.put("timestamp", Instant.now().toString());
+        
+        // Create response
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", "application/json");
+        headers.put("Access-Control-Allow-Origin", "*");
+        
+        APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
+        response.setStatusCode(200);
+        response.setHeaders(headers);
+        response.setBody(gson.toJson(responseBody));
+        
+        return response;
+    }
+}</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">XML - pom.xml</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;com.amazonaws&lt;/groupId&gt;
+        &lt;artifactId&gt;aws-lambda-java-core&lt;/artifactId&gt;
+        &lt;version&gt;1.2.2&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;com.amazonaws&lt;/artifactId&gt;
+        &lt;artifactId&gt;aws-lambda-java-events&lt;/artifactId&gt;
+        &lt;version&gt;3.11.0&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;com.google.code.gson&lt;/groupId&gt;
+        &lt;artifactId&gt;gson&lt;/artifactId&gt;
+        &lt;version&gt;2.10.1&lt;/version&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;</code></pre>
+                </div>
+            </div>
+
+            <!-- Go Tab -->
+            <div class="code-tab-content" data-tab="go-lambda">
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Go - main.go</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>package main
+
+import (
+    "context"
+    "encoding/json"
+    "fmt"
+    "time"
+
+    "github.com/aws/aws-lambda-go/events"
+    "github.com/aws/aws-lambda-go/lambda"
+)
+
+type Response struct {
+    Message   string `json:"message"`
+    UserID    string `json:"userId"`
+    Timestamp string `json:"timestamp"`
+}
+
+func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+    // Log request
+    requestJSON, _ := json.Marshal(request)
+    fmt.Printf("Request: %s\n", requestJSON)
+    
+    // Parse request
+    userID := request.PathParameters["id"]
+    
+    // Your business logic here
+    response := Response{
+        Message:   "Hello from Lambda!",
+        UserID:    userID,
+        Timestamp: time.Now().Format(time.RFC3339),
+    }
+    
+    responseBody, err := json.Marshal(response)
+    if err != nil {
+        return events.APIGatewayProxyResponse{
+            StatusCode: 500,
+            Body:       `{"error": "Internal server error"}`,
+        }, err
+    }
+    
+    return events.APIGatewayProxyResponse{
+        StatusCode: 200,
+        Headers: map[string]string{
+            "Content-Type":                "application/json",
+            "Access-Control-Allow-Origin": "*",
+        },
+        Body: string(responseBody),
+    }, nil
+}
+
+func main() {
+    lambda.Start(handler)
+}</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">Text - go.mod</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>module my-lambda-function
+
+go 1.21
+
+require (
+    github.com/aws/aws-lambda-go v1.41.0
+)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box tip" style="margin-top: 1.5rem;">
+            <div class="info-icon">💡</div>
+            <div class="info-content">
+                <strong>Test local trước khi deploy:</strong><br>
+                Node.js/Python: Chạy trực tiếp với test event<br>
+                .NET/Java/Go: Dùng SAM CLI: <code>sam local invoke</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 1: Create Lambda Function -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">03</span>
+            Hướng dẫn triển khai từng bước
+        </h3>
+
+        <!-- Step 1 -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 1</div>
+                <h4 class="step-title">Tạo Lambda Function</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Tạo Lambda function với code đã chuẩn bị. Chọn phương pháp phù hợp với workflow của bạn.
+                </p>
+
+                <div class="code-tabs">
+                    <div class="code-tab-buttons">
+                        <button class="code-tab-btn active" data-tab="console-create">AWS Console</button>
+                        <button class="code-tab-btn" data-tab="cli-create">AWS CLI</button>
+                        <button class="code-tab-btn" data-tab="sam-create">SAM Template</button>
+                    </div>
+
+                    <!-- Console Tab -->
+                    <div class="code-tab-content active" data-tab="console-create">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Hướng dẫn trên Console</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code>1. Vào Lambda Console → Create function
+2. Chọn "Author from scratch"
+3. Function name: my-api-function
+4. Runtime: Node.js 20.x (hoặc Python 3.11, .NET 8, Java 21, Go 1.x)
+5. Architecture: x86_64 (hoặc arm64 cho rẻ hơn)
+6. Permissions:
+   - Create new role with basic Lambda permissions
+7. Click "Create function"
+
+8. Upload code:
+   - Nếu code nhỏ (<10MB): Paste trực tiếp vào editor
+   - Nếu code lớn: Zip và upload
+   - Hoặc: Deploy từ S3
+
+9. Configure:
+   - Handler: index.handler (Node.js) hoặc lambda_function.lambda_handler (Python)
+   - Memory: 128MB - 512MB (tùy nhu cầu)
+   - Timeout: 30 seconds (default 3s)
+   - Environment variables: Thêm nếu cần</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- CLI Tab -->
+                    <div class="code-tab-content" data-tab="cli-create">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Zip code (Node.js example)
+zip -r function.zip index.js node_modules/
+
+# Create IAM role for Lambda
+aws iam create-role \
+  --role-name lambda-execution-role \
+  --assume-role-policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [{
+      "Effect": "Allow",
+      "Principal": {"Service": "lambda.amazonaws.com"},
+      "Action": "sts:AssumeRole"
+    }]
+  }'
+
+# Attach basic execution policy
+aws iam attach-role-policy \
+  --role-name lambda-execution-role \
+  --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+# Create Lambda function
+aws lambda create-function \
+  --function-name my-api-function \
+  --runtime nodejs20.x \
+  --role arn:aws:iam::YOUR_ACCOUNT_ID:role/lambda-execution-role \
+  --handler index.handler \
+  --zip-file fileb://function.zip \
+  --timeout 30 \
+  --memory-size 256
+
+# Test function
+aws lambda invoke \
+  --function-name my-api-function \
+  --payload '{"pathParameters":{"id":"123"}}' \
+  response.json
+
+cat response.json</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- SAM Tab -->
+                    <div class="code-tab-content" data-tab="sam-create">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">YAML - template.yaml</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code>AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: My Serverless API
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Runtime: nodejs20.x
+
+Resources:
+  MyApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./
+      Handler: index.handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /users/{id}
+            Method: get
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref MyDynamoDBTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MyDynamoDBTable
+
+  MyDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: users-table
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/'</code></pre>
+                        </div>
+
+                        <div class="code-block" style="margin-top: 1rem;">
+                            <div class="code-header">
+                                <span class="code-language">Bash - Deploy với SAM</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Build
+sam build
+
+# Deploy (first time)
+sam deploy --guided
+
+# Deploy (subsequent times)
+sam deploy
+
+# Test local
+sam local invoke MyApiFunction -e events/test-event.json
+
+# Start local API
+sam local start-api</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box tip">
+                    <div class="info-icon">💡</div>
+                    <div class="info-content">
+                        <strong>Khuyến nghị:</strong> Dùng SAM hoặc Serverless Framework cho production. Console chỉ phù
+                        hợp cho testing/prototype.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: API Gateway -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 2</div>
+                <h4 class="step-title">Cấu hình API Gateway</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Tạo API endpoint để gọi Lambda function từ internet. Chọn REST API (full features) hoặc HTTP API (rẻ
+                    hơn, đơn giản hơn).
+                </p>
+
+                <div class="code-tabs">
+                    <div class="code-tab-buttons">
+                        <button class="code-tab-btn active" data-tab="rest-api">REST API</button>
+                        <button class="code-tab-btn" data-tab="http-api">HTTP API</button>
+                    </div>
+
+                    <!-- REST API Tab -->
+                    <div class="code-tab-content active" data-tab="rest-api">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - REST API</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Create REST API
+aws apigateway create-rest-api \
+  --name my-api \
+  --description "My Serverless API"
+
+# Get API ID (from output above)
+API_ID=abc123xyz
+
+# Get root resource ID
+aws apigateway get-resources \
+  --rest-api-id $API_ID
+
+# Create resource /users
+aws apigateway create-resource \
+  --rest-api-id $API_ID \
+  --parent-id ROOT_RESOURCE_ID \
+  --path-part users
+
+# Create resource /users/{id}
+aws apigateway create-resource \
+  --rest-api-id $API_ID \
+  --parent-id USERS_RESOURCE_ID \
+  --path-part {id}
+
+# Create GET method
+aws apigateway put-method \
+  --rest-api-id $API_ID \
+  --resource-id USER_ID_RESOURCE_ID \
+  --http-method GET \
+  --authorization-type NONE
+
+# Integrate with Lambda
+aws apigateway put-integration \
+  --rest-api-id $API_ID \
+  --resource-id USER_ID_RESOURCE_ID \
+  --http-method GET \
+  --type AWS_PROXY \
+  --integration-http-method POST \
+  --uri arn:aws:apigateway:REGION:lambda:path/2015-03-31/functions/arn:aws:lambda:REGION:ACCOUNT_ID:function:my-api-function/invocations
+
+# Grant API Gateway permission to invoke Lambda
+aws lambda add-permission \
+  --function-name my-api-function \
+  --statement-id apigateway-invoke \
+  --action lambda:InvokeFunction \
+  --principal apigateway.amazonaws.com
+
+# Deploy API
+aws apigateway create-deployment \
+  --rest-api-id $API_ID \
+  --stage-name prod
+
+# Test
+curl https://$API_ID.execute-api.REGION.amazonaws.com/prod/users/123</code></pre>
+                        </div>
+
+                        <div class="info-box warning">
+                            <div class="info-icon">⚠️</div>
+                            <div class="info-content">
+                                <strong>REST API Features:</strong> Caching, throttling, API keys, request validation.
+                                Phù hợp cho enterprise apps.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- HTTP API Tab -->
+                    <div class="code-tab-content" data-tab="http-api">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - HTTP API (Recommended)</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Create HTTP API với Lambda integration (1 command!)
+aws apigatewayv2 create-api \
+  --name my-http-api \
+  --protocol-type HTTP \
+  --target arn:aws:lambda:REGION:ACCOUNT_ID:function:my-api-function
+
+# Get API ID
+API_ID=abc123xyz
+
+# Grant permission
+aws lambda add-permission \
+  --function-name my-api-function \
+  --statement-id apigatewayv2-invoke \
+  --action lambda:InvokeFunction \
+  --principal apigateway.amazonaws.com \
+  --source-arn "arn:aws:execute-api:REGION:ACCOUNT_ID:$API_ID/*/*"
+
+# Create route (optional, for specific paths)
+aws apigatewayv2 create-route \
+  --api-id $API_ID \
+  --route-key 'GET /users/{id}'
+
+# Test
+curl https://$API_ID.execute-api.REGION.amazonaws.com/users/123</code></pre>
+                        </div>
+
+                        <div class="info-box success">
+                            <div class="info-icon">✅</div>
+                            <div class="info-content">
+                                <strong>HTTP API Benefits:</strong> 70% rẻ hơn REST API, latency thấp hơn, setup đơn
+                                giản hơn. Khuyến nghị cho hầu hết use cases!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Database Integration -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 3</div>
+                <h4 class="step-title">Kết nối Database</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Kết nối Lambda với database. DynamoDB (serverless NoSQL) hoặc RDS Proxy (SQL với connection
+                    pooling).
+                </p>
+
+                <div class="code-tabs">
+                    <div class="code-tab-buttons">
+                        <button class="code-tab-btn active" data-tab="dynamodb">DynamoDB</button>
+                        <button class="code-tab-btn" data-tab="rds-proxy">RDS Proxy</button>
+                    </div>
+
+                    <!-- DynamoDB Tab -->
+                    <div class="code-tab-content active" data-tab="dynamodb">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - Create DynamoDB Table</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Create table
+aws dynamodb create-table \
+  --table-name users \
+  --attribute-definitions \
+    AttributeName=id,AttributeType=S \
+  --key-schema \
+    AttributeName=id,KeyType=HASH \
+  --billing-mode PAY_PER_REQUEST
+
+# Grant Lambda permission
+aws iam attach-role-policy \
+  --role-name lambda-execution-role \
+  --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess</code></pre>
+                        </div>
+
+                        <div class="code-block" style="margin-top: 1rem;">
+                            <div class="code-header">
+                                <span class="code-language">JavaScript - Lambda Code với DynamoDB</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code>const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBDocumentClient, GetCommand, PutCommand } = require("@aws-sdk/lib-dynamodb");
+
+const client = new DynamoDBClient({});
+const docClient = DynamoDBDocumentClient.from(client);
+
+exports.handler = async (event) => {
+    const userId = event.pathParameters?.id;
+    
+    // Get item from DynamoDB
+    const command = new GetCommand({
+        TableName: process.env.TABLE_NAME,
+        Key: { id: userId }
+    });
+    
+    const result = await docClient.send(command);
+    
+    return {
+        statusCode: 200,
+        body: JSON.stringify(result.Item)
+    };
+};</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- RDS Proxy Tab -->
+                    <div class="code-tab-content" data-tab="rds-proxy">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - Setup RDS Proxy</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Create RDS Proxy (requires existing RDS instance)
+aws rds create-db-proxy \
+  --db-proxy-name my-rds-proxy \
+  --engine-family POSTGRESQL \
+  --auth '{
+    "AuthScheme": "SECRETS",
+    "SecretArn": "arn:aws:secretsmanager:REGION:ACCOUNT_ID:secret:db-secret",
+    "IAMAuth": "DISABLED"
+  }' \
+  --role-arn arn:aws:iam::ACCOUNT_ID:role/RDSProxyRole \
+  --vpc-subnet-ids subnet-123 subnet-456
+
+# Register target (RDS instance)
+aws rds register-db-proxy-targets \
+  --db-proxy-name my-rds-proxy \
+  --db-instance-identifiers my-rds-instance
+
+# Update Lambda to use VPC
+aws lambda update-function-configuration \
+  --function-name my-api-function \
+  --vpc-config SubnetIds=subnet-123,subnet-456,SecurityGroupIds=sg-123</code></pre>
+                        </div>
+
+                        <div class="code-block" style="margin-top: 1rem;">
+                            <div class="code-header">
+                                <span class="code-language">JavaScript - Lambda Code với RDS Proxy</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code>const { Client } = require('pg');
+
+let client;
+
+exports.handler = async (event) => {
+    // Reuse connection across invocations
+    if (!client) {
+        client = new Client({
+            host: process.env.DB_PROXY_ENDPOINT,
+            port: 5432,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME
+        });
+        await client.connect();
+    }
+    
+    const userId = event.pathParameters?.id;
+    const result = await client.query('SELECT * FROM users WHERE id = $1', [userId]);
+    
+    return {
+        statusCode: 200,
+        body: JSON.stringify(result.rows[0])
+    };
+};</code></pre>
+                        </div>
+
+                        <div class="info-box warning">
+                            <div class="info-icon">⚠️</div>
+                            <div class="info-content">
+                                <strong>RDS Proxy:</strong> Cần cho SQL databases để tránh connection exhaustion. Chi
+                                phí thêm ~$0.015/hour.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Environment Variables & Secrets -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 4</div>
+                <h4 class="step-title">Environment Variables & Secrets</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Quản lý configuration và sensitive data an toàn.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Bash - Environment Variables</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># Set environment variables
+aws lambda update-function-configuration \
+  --function-name my-api-function \
+  --environment "Variables={
+    TABLE_NAME=users,
+    STAGE=production,
+    LOG_LEVEL=info
+  }"</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">Bash - AWS Secrets Manager</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># Create secret
+aws secretsmanager create-secret \
+  --name prod/myapp/db \
+  --secret-string '{
+    "username":"admin",
+    "password":"super-secret-password",
+    "host":"db.example.com"
+  }'
+
+# Grant Lambda permission
+aws iam attach-role-policy \
+  --role-name lambda-execution-role \
+  --policy-arn arn:aws:iam::aws:policy/SecretsManagerReadWrite</code></pre>
+                </div>
+
+                <div class="code-block" style="margin-top: 1rem;">
+                    <div class="code-header">
+                        <span class="code-language">JavaScript - Read Secrets in Lambda</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code>const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
+
+const client = new SecretsManagerClient({});
+let cachedSecret;
+
+async function getSecret() {
+    if (cachedSecret) return cachedSecret;
+    
+    const command = new GetSecretValueCommand({
+        SecretId: "prod/myapp/db"
+    });
+    
+    const response = await client.send(command);
+    cachedSecret = JSON.parse(response.SecretString);
+    return cachedSecret;
+}
+
+exports.handler = async (event) => {
+    const secret = await getSecret();
+    // Use secret.username, secret.password, etc.
+};</code></pre>
+                </div>
+
+                <div class="info-box important">
+                    <div class="info-icon">🔒</div>
+                    <div class="info-content">
+                        <strong>Security:</strong> KHÔNG BAO GIỜ hardcode passwords trong code! Dùng Secrets Manager
+                        hoặc Parameter Store.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Deploy with SAM/Serverless -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 5</div>
+                <h4 class="step-title">Deploy với SAM/Serverless Framework</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Production deployment với Infrastructure as Code.
+                </p>
+
+                <div class="code-tabs">
+                    <div class="code-tab-buttons">
+                        <button class="code-tab-btn active" data-tab="sam-deploy">SAM</button>
+                        <button class="code-tab-btn" data-tab="serverless-deploy">Serverless Framework</button>
+                    </div>
+
+                    <!-- SAM Tab -->
+                    <div class="code-tab-content active" data-tab="sam-deploy">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">Bash - SAM Deployment</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Install SAM CLI
+pip install aws-sam-cli
+
+# Initialize project
+sam init
+
+# Build
+sam build
+
+# Deploy (first time - interactive)
+sam deploy --guided
+
+# Deploy (subsequent times)
+sam deploy
+
+# View logs
+sam logs -n MyApiFunction --tail
+
+# Delete stack
+sam delete</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Serverless Framework Tab -->
+                    <div class="code-tab-content" data-tab="serverless-deploy">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <span class="code-language">YAML - serverless.yml</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code>service: my-api
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  environment:
+    TABLE_NAME: ${self:service}-users-${self:provider.stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:*
+          Resource: !GetAtt UsersTable.Arn
+
+functions:
+  api:
+    handler: index.handler
+    events:
+      - httpApi:
+          path: /users/{id}
+          method: get
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-users-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST</code></pre>
+                        </div>
+
+                        <div class="code-block" style="margin-top: 1rem;">
+                            <div class="code-header">
+                                <span class="code-language">Bash - Serverless Commands</span>
+                                <button class="copy-btn" onclick="copyCode(this)">
+                                    <span class="copy-icon">📋</span>
+                                    Copy
+                                </button>
+                            </div>
+                            <pre><code># Install
+npm install -g serverless
+
+# Deploy
+serverless deploy
+
+# Deploy single function (faster)
+serverless deploy function -f api
+
+# View logs
+serverless logs -f api --tail
+
+# Remove stack
+serverless remove</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6: Custom Domain & SSL -->
+        <div class="step-card">
+            <div class="step-header">
+                <div class="step-number">Bước 6</div>
+                <h4 class="step-title">Custom Domain & SSL (Optional)</h4>
+            </div>
+            <div class="step-content">
+                <p class="step-description">
+                    Sử dụng domain riêng thay vì URL mặc định của API Gateway.
+                </p>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">Bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">
+                            <span class="copy-icon">📋</span>
+                            Copy
+                        </button>
+                    </div>
+                    <pre><code># Request SSL certificate
+aws acm request-certificate \
+  --domain-name api.yourdomain.com \
+  --validation-method DNS
+
+# Create custom domain (HTTP API)
+aws apigatewayv2 create-domain-name \
+  --domain-name api.yourdomain.com \
+  --domain-name-configurations CertificateArn=arn:aws:acm:REGION:ACCOUNT_ID:certificate/CERT_ID
+
+# Create API mapping
+aws apigatewayv2 create-api-mapping \
+  --domain-name api.yourdomain.com \
+  --api-id $API_ID \
+  --stage $STAGE
+
+# Create Route 53 record
+aws route53 change-resource-record-sets \
+  --hosted-zone-id Z123456 \
+  --change-batch '{
+    "Changes": [{
+      "Action": "CREATE",
+      "ResourceRecordSet": {
+        "Name": "api.yourdomain.com",
+        "Type": "A",
+        "AliasTarget": {
+          "HostedZoneId": "API_GATEWAY_HOSTED_ZONE_ID",
+          "DNSName": "API_GATEWAY_DOMAIN_NAME",
+          "EvaluateTargetHealth": false
+        }
+      }
+    }]
+  }'
+
+# Test
+curl https://api.yourdomain.com/users/123</code></pre>
+                </div>
+
+                <div class="info-box success">
+                    <div class="info-icon">✅</div>
+                    <div class="info-content">
+                        <strong>Hoàn thành!</strong> API của bạn đã chạy trên Lambda với custom domain và HTTPS.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Troubleshooting -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">04</span>
+            Xử lý sự cố thường gặp
+        </h3>
+
+        <div class="accordion">
+            <div class="accordion-item">
+                <button class="accordion-header">
+                    Cold start latency cao
+                    <span class="accordion-icon">+</span>
+                </button>
+                <div class="accordion-content">
+                    <ul>
+                        <li><strong>Nguyên nhân:</strong> Lambda container khởi động lần đầu (cold start)</li>
+                        <li><strong>Giải pháp:</strong>
+                            <ul>
+                                <li>Giảm package size (loại bỏ dependencies không cần)</li>
+                                <li>Dùng Provisioned Concurrency (giữ containers warm)</li>
+                                <li>Chọn runtime nhanh (Node.js, Python nhanh hơn Java, .NET)</li>
+                                <li>Dùng arm64 architecture (rẻ hơn, nhanh hơn)</li>
+                                <li>Tách code thành nhiều functions nhỏ</li>
+                            </ul>
+                        </li>
+                        <li><strong>Test:</strong> <code>aws lambda invoke --function-name my-function out.json</code>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-header">
+                    Timeout errors
+                    <span class="accordion-icon">+</span>
+                </button>
+                <div class="accordion-content">
+                    <ul>
+                        <li><strong>Nguyên nhân:</strong> Function chạy quá 30s (hoặc timeout đã set)</li>
+                        <li><strong>Giải pháp:</strong>
+                            <ul>
+                                <li>Tăng timeout: <code>aws lambda update-function-configuration --timeout 300</code>
+                                </li>
+                                <li>Optimize database queries (add indexes)</li>
+                                <li>Dùng async processing (SQS, Step Functions)</li>
+                                <li>Cache kết quả (DynamoDB, ElastiCache)</li>
+                                <li>Parallel processing với Promise.all()</li>
+                            </ul>
+                        </li>
+                        <li><strong>Monitor:</strong> CloudWatch Logs → Filter "Task timed out"</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-header">
+                    Out of memory errors
+                    <span class="accordion-icon">+</span>
+                </button>
+                <div class="accordion-content">
+                    <ul>
+                        <li><strong>Nguyên nhân:</strong> Function dùng nhiều RAM hơn allocated memory</li>
+                        <li><strong>Giải pháp:</strong>
+                            <ul>
+                                <li>Tăng memory: <code>aws lambda update-function-configuration --memory-size 512</code>
+                                </li>
+                                <li>Process data theo chunks (streaming)</li>
+                                <li>Giải phóng memory: <code>delete largeObject</code></li>
+                                <li>Dùng S3 cho large files (đừng load vào memory)</li>
+                                <li>Monitor memory usage: CloudWatch Metrics → MaxMemoryUsed</li>
+                            </ul>
+                        </li>
+                        <li><strong>Tip:</strong> Tăng memory cũng tăng CPU → function chạy nhanh hơn!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Best Practices -->
+    <div class="content-block">
+        <h3 class="block-title">
+            <span class="title-number">05</span>
+            Best Practices & Cost Optimization
+        </h3>
+
+        <div class="tips-grid">
+            <div class="tip-card">
+                <div class="tip-icon">⚡</div>
+                <h4>Performance</h4>
+                <ul>
+                    <li>Minimize cold starts (giảm package size)</li>
+                    <li>Reuse connections (database, HTTP clients)</li>
+                    <li>Use environment variables cho config</li>
+                    <li>Enable X-Ray tracing để debug</li>
+                    <li>Dùng arm64 (Graviton2) cho performance tốt hơn</li>
+                </ul>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-icon">🔒</div>
+                <h4>Security</h4>
+                <ul>
+                    <li>Principle of least privilege (IAM roles)</li>
+                    <li>Dùng Secrets Manager cho credentials</li>
+                    <li>Enable VPC cho database access</li>
+                    <li>Validate input data (prevent injection)</li>
+                    <li>Enable CloudTrail logging</li>
+                </ul>
+            </div>
+
+            <div class="tip-card">
+                <div class="tip-icon">💰</div>
+                <h4>Cost Optimization</h4>
+                <ul>
+                    <li>Right-size memory (test để tìm optimal)</li>
+                    <li>Dùng HTTP API thay vì REST API (rẻ hơn 70%)</li>
+                    <li>Set appropriate timeout (đừng để 15 phút nếu chỉ cần 10s)</li>
+                    <li>Delete unused functions và versions</li>
+                    <li>Monitor với Cost Explorer</li>
+                </ul>
+            </div>
+        </div>
     </div>
 </section>
